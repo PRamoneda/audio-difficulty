@@ -3,6 +3,7 @@ from statistics import mean, stdev
 
 import numpy as np
 import torch
+from scipy.stats import kendalltau
 from sklearn.metrics import mean_squared_error, balanced_accuracy_score
 from torch import nn
 from torch.nn import functional as F
@@ -10,6 +11,8 @@ from collections import OrderedDict
 import collections
 import utils
 import pdb
+
+from make_table_basic_model import compute_only_genre
 from utils import prediction2label
 
 
@@ -238,6 +241,11 @@ def get_pianoroll(rep, k):
     inp_data = inp_data.unsqueeze(0).permute(0, 2, 1, 3)
     return inp_data
 
+
+
+
+
+
 def compute_model_basic(model_name, rep, modality_dropout):
     seed = 42
     np.random.seed(seed)
@@ -286,6 +294,7 @@ def compute_model_basic(model_name, rep, modality_dropout):
             mse.append(get_mse_macro(true_labels, pred_labels))
             acc.append(balanced_accuracy_score(true_labels, pred_labels))
         # with one decimal
+        # with one decima
         print(f"mse: {mean(mse):.1f}({stdev(mse):.1f})", end=" ")
         print(f"acc: {mean(acc)*100:.1f}({stdev(acc)*100:.1f})")
         utils.save_json({
@@ -295,8 +304,19 @@ def compute_model_basic(model_name, rep, modality_dropout):
         }, f"cache/{model_name}.json")
     else:
         data = utils.load_json(f"cache/{model_name}.json")
-        print(f"mse: {mean(data['mse']):.1f}({stdev(data['mse']):.1f})", end=" ")
-        print(f"acc: {mean(data['acc'])*100:.1f}({stdev(data['acc'])*100:.2f})")
+        tau_c, mse, acc = [], [], []
+        for i in range(5):
+            pred, true = [], []
+            for k, dd in data["predictions"][i].items():
+                pred.append(dd["pred"])
+                true.append(dd["true"])
+            tau_c.append(kendalltau(x=true, y=pred).statistic)
+            mse.append(get_mse_macro(true, pred))
+            acc.append(balanced_accuracy_score(true, pred))
+        print(model_name, end="// ")
+        print(f"& {mean(mse):.2f}({stdev(mse):.2f})", end=" ")
+        print(f"& {mean(acc) * 100:.1f}({stdev(acc) * 100:.2f})", end=" ")
+        print(f"& {mean(tau_c):.3f}({stdev(tau_c):.3f})")
 
 
 
@@ -305,3 +325,7 @@ if __name__ == '__main__':
     compute_model_basic("audio_midi_cqt5multiranking_v10", "cqt5", modality_dropout=False)
     compute_model_basic("audio_midi_pr5multiranking_v10", "pianoroll5", modality_dropout=False)
 
+    compute_only_genre("audio_midi_cqt5multiranking_v10", only_men=True)
+    compute_only_genre("audio_midi_pr5multiranking_v10", only_men=True)
+    compute_only_genre("audio_midi_cqt5multiranking_v10", only_women=True)
+    compute_only_genre("audio_midi_pr5multiranking_v10", only_women=True)

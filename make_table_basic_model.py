@@ -1,3 +1,5 @@
+import json
+import math
 import os
 from statistics import mean, stdev
 
@@ -11,6 +13,7 @@ import collections
 import utils
 import pdb
 from utils import prediction2label
+from scipy.stats import kendalltau
 
 
 import numpy as np
@@ -123,12 +126,14 @@ def get_conv_layer(rep_name):
 
 class multimodal_cnns(nn.Module):
 
-    def __init__(self, modality_dropout):
+    def __init__(self, modality_dropout, only_cqt=False, only_pr=False):
         super().__init__()
 
         self.midi_branch = get_conv_layer("pianoroll5")
         self.audio_branch = get_conv_layer("cqt5")
         self.modality_dropout = modality_dropout
+        self.only_cqt = only_cqt
+        self.only_pr = only_pr
 
     def forward(self, x):
         x_midi, x_audio = x
@@ -136,12 +141,10 @@ class multimodal_cnns(nn.Module):
         x_midi = self.midi_branch(x_midi)
         x_audio = self.audio_branch(x_audio)
         # do a modality dropout
-        if self.modality_dropout:
-            russian_roulette = torch.rand(1).item()
-            if russian_roulette < 0.1:
-                x_midi = torch.zeros_like(x_midi, device=x_midi.device)
-            elif russian_roulette < 0.2:
-                x_audio = torch.zeros_like(x_audio, device=x_audio.device)
+        if self.only_cqt:
+            x_midi = torch.zeros_like(x_midi, device=x_midi.device)
+        elif self.only_pr:
+            x_audio = torch.zeros_like(x_audio, device=x_audio.device)
         # print(x_midi.shape, x_audio.shape)
         x_midi_trimmed = x_midi[:, :, :x_audio.size(2), :]
 
@@ -149,7 +152,7 @@ class multimodal_cnns(nn.Module):
 
         return cnns_out
 class AudioModel(nn.Module):
-    def __init__(self, num_classes, rep, modality_dropout):
+    def __init__(self, num_classes, rep, modality_dropout, only_cqt=False, only_pr=False):
         super(AudioModel, self).__init__()
 
         # All Convolutional Layers in a Sequential Block
@@ -160,7 +163,7 @@ class AudioModel(nn.Module):
         elif "mel" in rep:
             conv = get_conv_layer(rep)
         elif "multimodal" in rep:
-            conv = multimodal_cnns(modality_dropout)
+            conv = multimodal_cnns(modality_dropout, only_cqt, only_pr)
         self.conv_layers = conv
 
         # Calculate the size of GRU input feature
@@ -218,7 +221,7 @@ def get_pianoroll(rep, k):
     inp_data = inp_data.unsqueeze(0).permute(0, 2, 1, 3)
     return inp_data
 
-def compute_model_basic(model_name, rep, modality_dropout):
+def compute_model_basic(model_name, rep, modality_dropout, only_cqt=False, only_pr=False):
     seed = 42
     np.random.seed(seed)
     torch.manual_seed(seed)
@@ -227,10 +230,16 @@ def compute_model_basic(model_name, rep, modality_dropout):
     data = utils.load_json("../videos_download/split_audio.json")
     mse, acc = [], []
     predictions = []
-    if not os.path.exists(f"cache/{model_name}.json"):
+    if only_cqt:
+        cache_name = model_name + "_cqt"
+    elif only_pr:
+        cache_name = model_name + "_pr"
+    else:
+        cache_name = model_name
+    if not os.path.exists(f"cache/{cache_name}.json"):
         for split in range(5):
             #load_model
-            model = AudioModel(11, rep, modality_dropout)
+            model = AudioModel(11, rep, modality_dropout, only_cqt, only_pr)
             checkpoint = torch.load(f"models/{model_name}/checkpoint_{split}.pth",  map_location='cuda:0')
             # print(checkpoint["epoch"])
             # print(checkpoint.keys())
@@ -272,20 +281,147 @@ def compute_model_basic(model_name, rep, modality_dropout):
             "mse": mse,
             "acc": acc,
             "predictions": predictions
-        }, f"cache/{model_name}.json")
+        }, f"cache/{cache_name}.json")
     else:
-        data = utils.load_json(f"cache/{model_name}.json")
+        data = utils.load_json(f"cache/{cache_name}.json")
+        tau_c, mse, acc = [], [], []
+        for i in range(5):
+            pred, true = [], []
+            for k, dd in data["predictions"][i].items():
+                pred.append(dd["pred"])
+                true.append(dd["true"])
+            tau_c.append(kendalltau(x=true, y=pred).statistic)
+            mse.append(get_mse_macro(true, pred))
+            acc.append(balanced_accuracy_score(true, pred))
         print(model_name, end="// ")
-        print(f"mse: {mean(data['mse']):.1f}({stdev(data['mse']):.1f})", end=" ")
-        print(f"acc: {mean(data['acc'])*100:.1f}({stdev(data['acc'])*100:.1f})")
+        print(f"& {mean(mse):.2f}({stdev(mse):.2f})", end=" ")
+        print(f"& {mean(acc) * 100:.1f}({stdev(acc) * 100:.2f})", end=" ")
+        print(f"& {mean(tau_c):.3f}({stdev(tau_c):.3f})")
 
 
+def compute_ensemble(truncate=False):
+    round_func = lambda x: math.ceil(x) if truncate else math.floor(x)
+    data_pr = utils.load_json(f"cache/audio_midi_cqt5_ps_v5.json")
+    data_cqt = utils.load_json(f"cache/audio_midi_pianoroll_ps_5_v4.json")
+    tau_c, mse, acc = [], [], []
+    for i in range(5):
+        pred, true = [], []
+        for k, dd in data_pr["predictions"][i].items():
+            cqt_pred = data_cqt["predictions"][i][k]
+            pred.append(round_func((dd["pred"] + cqt_pred["pred"])/2))
+            true.append(dd["true"])
+        tau_c.append(kendalltau(x=true, y=pred).statistic)
+        mse.append(get_mse_macro(true, pred))
+        acc.append(balanced_accuracy_score(true, pred))
+    print("ensemble", end="// ")
+    print(f"& {mean(mse):.2f}({stdev(mse):.2f})", end=" ")
+    print(f"& {mean(acc) * 100:.1f}({stdev(acc) * 100:.2f})", end=" ")
+    print(f"& {mean(tau_c):.3f}({stdev(tau_c):.3f})")
+
+
+def load_json(name_file):
+    with open(name_file, 'r') as fp:
+        data = json.load(fp)
+    return data
+
+
+def compute_only_genre(model_name, only_men=False, only_women=False):
+    data_pr = utils.load_json(f"cache/{model_name}.json")
+    women = load_json("../videos_download/previous_index/metadata_women_extended2.json").keys()
+    men = load_json("../videos_download/previous_index/metadata_men_extended2.json").keys()
+    if only_men:
+        composer_set = men
+    elif only_women:
+        composer_set = women
+    tau_c, mse, acc = [], [], []
+    for i in range(5):
+        pred, true = [], []
+        for k, dd in data_pr["predictions"][i].items():
+            if k not in composer_set:
+                continue
+            pred.append(dd["pred"])
+            true.append(dd["true"])
+        tau_c.append(kendalltau(x=true, y=pred).statistic)
+        mse.append(get_mse_macro(true, pred))
+        acc.append(balanced_accuracy_score(true, pred))
+    print(model_name, "only_men" if only_men else "", "only_women" if only_women else "", end="// ")
+    print(f"& {mean(mse):.2f}({stdev(mse):.2f})", end=" ")
+    print(f"& {mean(acc) * 100:.1f}({stdev(acc) * 100:.2f})", end=" ")
+    print(f"& {mean(tau_c):.3f}({stdev(tau_c):.3f})")
+
+
+ERAS = [
+    "baroque",
+    "classical",
+    "romantic",
+    "c20",
+    "modern",
+    "other"
+]
+
+
+def compute_for_eras(model_name):
+    data_pr = utils.load_json(f"cache/{model_name}.json")
+    metadata = load_json("../videos_download/final_index/new_clean_data.json")
+    tau_c, mse, acc = [], [], []
+    for era in ERAS:
+        if era == "other":
+            pieces = [k for k, mm in metadata.items() if "period" not in mm or mm["period"].lower() not in ERAS]
+        else:
+            pieces = [k for k, mm in metadata.items() if "period" in mm and mm["period"].lower() == era]
+        print(era, len(pieces))
+        for i in range(5):
+            pred, true = [], []
+            for k, dd in data_pr["predictions"][i].items():
+                if k not in pieces:
+                    continue
+                pred.append(dd["pred"])
+                true.append(dd["true"])
+            tau_c.append(kendalltau(x=true, y=pred).statistic)
+            mse.append(get_mse_macro(true, pred))
+            acc.append(balanced_accuracy_score(true, pred))
+        print(model_name, era, end="// ")
+        print(f"& {mean(mse):.2f}({stdev(mse):.2f})", end=" ")
+        print(f"& {mean(acc) * 100:.1f}({stdev(acc) * 100:.2f})", end=" ")
+        print(f"& {mean(tau_c):.3f}({stdev(tau_c):.3f})")
 
 
 if __name__ == '__main__':
-    compute_model_basic("audio_midi_cqt5_ps_v5", "cqt5", modality_dropout=False)
-    compute_model_basic("audio_midi_pianoroll_ps_5_v4", "pianoroll5", modality_dropout=False)
-    compute_model_basic("audio_midi_multi_ps_v5", "multimodal5", modality_dropout=False)
-    compute_model_basic("audio_midi_multi_ps_v5_drop", "multimodal5", modality_dropout=False)
-    compute_model_basic("audio_midi_cqt10_ps_v5", "cqt10", modality_dropout=False)
-    compute_model_basic("audio_midi_pianoroll_ps_10_v5", "pianoroll10", modality_dropout=False)
+    # compute_model_basic("audio_midi_cqt5_ps_v5", "cqt5", modality_dropout=False)
+    # compute_model_basic("audio_midi_cqt10_ps_v5", "cqt10", modality_dropout=False)
+    #
+    #
+    # compute_model_basic("audio_midi_pianoroll_ps_5_v4", "pianoroll5", modality_dropout=False)
+    # compute_model_basic("audio_midi_pianoroll_ps_10_v5", "pianoroll10", modality_dropout=False)
+    #
+    # compute_model_basic("audio_midi_multi_ps_v5", "multimodal5", modality_dropout=False, only_cqt=False)
+    # compute_model_basic("audio_midi_multi_ps_v5_drop", "multimodal5", modality_dropout=False, only_cqt=True)
+    #
+    # compute_model_basic("audio_midi_multi_ps_v5", "multimodal5", modality_dropout=False, only_pr=True)
+    # compute_model_basic("audio_midi_multi_ps_v5_drop", "multimodal5", modality_dropout=False, only_pr=True)
+
+    # compute_ensemble(truncate=False)
+    # compute_ensemble(truncate=True)
+
+    # compute_only_genre("audio_midi_cqt5_ps_v5", only_men=True)
+    # compute_only_genre("audio_midi_pianoroll_ps_5_v4", only_men=True)
+    # compute_only_genre("audio_midi_multi_ps_v5", only_men=True)
+    # compute_only_genre("audio_midi_cqt5_ps_v5", only_women=True)
+    # compute_only_genre("audio_midi_pianoroll_ps_5_v4", only_women=True)
+    #
+    # compute_only_genre("audio_midi_multi_ps_v5", only_women=True)
+    compute_for_eras("audio_midi_cqt5_ps_v5")
+
+    print()
+
+    compute_for_eras("audio_midi_pianoroll_ps_5_v4")
+
+    print()
+
+    compute_for_eras("audio_midi_cqt5era_v1")
+    print()
+
+    compute_for_eras("audio_midi_pr5era_v1")
+
+
+

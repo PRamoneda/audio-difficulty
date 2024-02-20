@@ -3,6 +3,7 @@ from statistics import mean, stdev
 
 import numpy as np
 import torch
+from scipy.stats import kendalltau
 from sklearn.metrics import mean_squared_error, balanced_accuracy_score
 from torch import nn
 from torch.nn import functional as F
@@ -295,8 +296,19 @@ def compute_model_basic(model_name, rep, modality_dropout):
         }, f"cache/{model_name}.json")
     else:
         data = utils.load_json(f"cache/{model_name}.json")
-        print(f"mse: {mean(data['mse']):.1f}({stdev(data['mse']):.1f})", end=" ")
-        print(f"acc: {mean(data['acc'])*100:.1f}({stdev(data['acc'])*100:.1f})")
+        tau_c, mse, acc = [], [], []
+        for i in range(5):
+            pred, true = [], []
+            for k, dd in data["predictions"][i].items():
+                pred.append(dd["pred"])
+                true.append(dd["true"])
+            tau_c.append(kendalltau(x=true, y=pred).statistic)
+            mse.append(get_mse_macro(true, pred))
+            acc.append(balanced_accuracy_score(true, pred))
+        print(model_name, end="// ")
+        print(f"& {mean(mse):.2f}({stdev(mse):.2f})", end=" ")
+        print(f"& {mean(acc) * 100:.1f}({stdev(acc) * 100:.2f})", end=" ")
+        print(f"& {mean(tau_c):.3f}({stdev(tau_c):.3f})")
 
 
 
@@ -304,4 +316,5 @@ def compute_model_basic(model_name, rep, modality_dropout):
 if __name__ == '__main__':
     compute_model_basic("audio_midi_cqt5era_v1", "cqt5", modality_dropout=False)
     compute_model_basic("audio_midi_pr5era_v1", "pianoroll5", modality_dropout=False)
+
 
