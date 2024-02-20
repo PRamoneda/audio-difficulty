@@ -102,7 +102,7 @@ class ResidualBlock(nn.Module):
 
 
 def get_conv_layer(rep_name):
-    if "pianoroll" in rep_name:
+    if "pianoroll" in rep_name or "pr" in rep_name:
         in_channels = 2
         kernel_width = (3, 4, 4)  # 88
     elif "mel" in rep_name:
@@ -169,7 +169,7 @@ class AudioModel(nn.Module):
         super(AudioModel, self).__init__()
 
         # All Convolutional Layers in a Sequential Block
-        if "pianoroll" in rep:
+        if "pianoroll" in rep or "pr" in rep:
             conv = get_conv_layer(rep)
         elif "cqt" in rep:
             conv = get_conv_layer(rep)
@@ -177,6 +177,7 @@ class AudioModel(nn.Module):
             conv = get_conv_layer(rep)
         elif "multimodal" in rep:
             conv = multimodal_cnns(modality_dropout)
+
         self.conv_layers = conv
 
         # Calculate the size of GRU input feature

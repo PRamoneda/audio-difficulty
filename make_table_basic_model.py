@@ -162,12 +162,12 @@ class AudioModel(nn.Module):
             conv = get_conv_layer(rep)
         elif "mel" in rep:
             conv = get_conv_layer(rep)
-        elif "multimodal" in rep:
+        elif "multi" in rep:
             conv = multimodal_cnns(modality_dropout, only_cqt, only_pr)
         self.conv_layers = conv
 
         # Calculate the size of GRU input feature
-        self.gru_input_size = 512 if "multimodal" in rep else 256
+        self.gru_input_size = 512 if "multi" in rep else 256
 
         # GRU Layer
         self.gru = nn.GRU(input_size=self.gru_input_size, hidden_size=128, num_layers=2,
