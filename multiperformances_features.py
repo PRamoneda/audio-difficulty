@@ -164,7 +164,7 @@ from pytube import YouTube
 from moviepy.editor import *
 
 
-def download_youtube_video_as_mp3(url, path, start_time = None, end_time = None):
+def download_youtube_video_as_mp3(url, path, start_time, end_time):
     """
     Download a video from a YouTube URL and save it as an MP3 file in the specified path.
 
@@ -179,8 +179,7 @@ def download_youtube_video_as_mp3(url, path, start_time = None, end_time = None)
     video = yt.streams.filter(only_audio=True).first()
     
     # Set the start and end time if provided
-    if start_time is not None and end_time is not None:
-        video = video.subclip(start_time, end_time)
+    video = video.subclip(float(start_time), float(end_time))
 
     # Download the audio stream
     out_file = video.download(output_path=f"tmp/{path}")
@@ -262,6 +261,12 @@ def downsample_cqt(path_mel, to_save, fs):
 
 if __name__ == '__main__':
     fs = 5
+
+    dir_names = ["multi/mp3", "multi/midi", f"multi/pr{fs}", f"multi/cqt{fs}", "multi/cqt_full"]
+    for dir_name in dir_names:
+        if not os.path.exists(dir_name):
+            os.makedirs(dir_name)
+
     for file_name in tqdm(os.listdir("benchmark_multiperformances")):
         if not file_name.endswith(".json"):
             continue
@@ -273,7 +278,7 @@ if __name__ == '__main__':
             idx = piece_index + "_" + idx
             # download the video from youtube and save into mp3
             if not os.path.exists(f"multi/mp3/{idx}.mp3"):
-                download_youtube_video_as_mp3(dd["youtube_url"], f"multi/mp3/{idx}.mp3")
+                download_youtube_video_as_mp3(dd["youtube_url"], f"multi/mp3/{idx}.mp3", dd["start_time"], dd["end_time"])
             # transcribe midi from audio with Kong et al (tiktok)
             if not os.path.exists(f"multi/midi/{idx}.mid"):
                 extract_midi(f"multi/mp3/{idx}.mp3", f"multi/midi/{idx}.mid")
