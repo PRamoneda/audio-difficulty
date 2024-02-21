@@ -23,15 +23,15 @@ from scipy.signal import resample
 
 
 def get_cqt(rep, k):
-    inp_data = utils.load_binary(f"hv/{rep}/{k}.bin")
+    inp_data = utils.load_binary(f"multi/{rep}/{k}.bin")
     inp_data = torch.tensor(inp_data, dtype=torch.float32).cuda()
     inp_data = inp_data.unsqueeze(0).unsqueeze(0).transpose(2, 3)
     return inp_data
 
 
 def get_pianoroll(rep, k):
-    inp_pr = utils.load_binary(f"hv/{rep}/{k}.bin")
-    inp_on = utils.load_binary(f"hv/{rep}/{k}_onset.bin")
+    inp_pr = utils.load_binary(f"multi/{rep}/{k}.bin")
+    inp_on = utils.load_binary(f"multi/{rep}/{k}_onset.bin")
     inp_pr = torch.from_numpy(inp_pr).float().cuda()
     inp_on = torch.from_numpy(inp_on).float().cuda()
     inp_data = torch.stack([inp_pr, inp_on], dim=1)
@@ -50,9 +50,6 @@ def compute_hv(rep, mode="basic"):
         elif mode == "multirank":
             model = AudioModelMultirank(11, rep, False)
         checkpoint = torch.load(f"models/{rep}/checkpoint_{split}.pth", map_location='cuda:0')
-        # print(checkpoint["epoch"])
-        # print(checkpoint.keys())
-        # pdb.set_trace()
         model.load_state_dict(checkpoint['model_state_dict'])
         model = model.cuda()
         model.eval()
@@ -77,7 +74,7 @@ def compute_hv(rep, mode="basic"):
                     "true": dd["grade_num"]
                 }
                 print("pred", pred)
-            save_binary(save, f"hv/logits/{rep}_split_{split}.bin")
+            save_binary(save, f"multi/logits/{rep}_split_{split}.bin")
 
 
 
