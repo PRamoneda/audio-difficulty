@@ -256,27 +256,26 @@ def downsample_cqt(path_mel, to_save, fs):
 
 
 if __name__ == '__main__':
-    # data = load_json("metadata_women_extended.json")
     fs = 5
     data = load_json("hidden_voices.json")
 
     for idx, dd in data.items():
         print(dd["video_url"])
         # download the video from youtube and save into mp3
-        if not os.path.exists(f"hv/mp3/{idx}.mp3"):
-            download_youtube_video_as_mp3(dd["video_url"], f"hv/mp3/{idx}.mp3")
+        if not os.path.exists(f"multi/mp3/{idx}.mp3"):
+            download_youtube_video_as_mp3(dd["video_url"], f"multi/mp3/{idx}.mp3")
         # transcribe midi from audio with Kong et al (tiktok)
-        if not os.path.exists(f"hv/midi/{idx}.mid"):
-            extract_midi(f"hv/mp3/{idx}.mp3", f"hv/midi/{idx}.mid")
+        if not os.path.exists(f"multi/midi/{idx}.mid"):
+            extract_midi(f"multi/mp3/{idx}.mp3", f"multi/midi/{idx}.mid")
         # pianoroll from midi
-        if not os.path.exists(f"hv/mel/{idx}.bin"):
-            convert2pianoroll(f"hv/midi/{idx}.mid", f"hv/pr{fs}/{idx}.bin", dd, fs)
+        if not os.path.exists(f"multi/mel/{idx}.bin"):
+            convert2pianoroll(f"multi/midi/{idx}.mid", f"multi/pr{fs}/{idx}.bin", dd, fs)
         # cqt from mp3
-        if not os.path.exists(f"hv/cqt_full/{idx}.bin"):
-            extract_cqt_full(f"hv/mp3/{idx}.mp3", f"hv/cqt_full/{idx}.bin", dd)
+        if not os.path.exists(f"multi/cqt_full/{idx}.bin"):
+            extract_cqt_full(f"multi/mp3/{idx}.mp3", f"multi/cqt_full/{idx}.bin", dd)
         # downsample cqt
-        if not os.path.exists(f"hv/cqt{fs}/{idx}.bin"):
-            downsample_cqt(f"hv/cqt_full/{idx}.bin", f"hv/cqt{fs}/{idx}.bin", fs)
+        if not os.path.exists(f"multi/cqt{fs}/{idx}.bin"):
+            downsample_cqt(f"multi/cqt_full/{idx}.bin", f"multi/cqt{fs}/{idx}.bin", fs)
 
 
 
