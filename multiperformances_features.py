@@ -190,6 +190,8 @@ def download_youtube_video_as_mp3(url, path, start_time, end_time):
     mp3_file = AudioFileClip(out_file)
     
     # Set the start and end time if provided
+    end_time = min(end_time, mp3_file.duration)
+    assert start_time < end_time <= mp3_file.duration, f"Invalid start and end times: {start_time}, {end_time}, {mp3_file.duration}"
     mp3_file = mp3_file.subclip(float(start_time), float(end_time))
 
     # Save the audio as an MP3 file
