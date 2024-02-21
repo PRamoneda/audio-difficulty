@@ -1,5 +1,6 @@
 # pip install pytube; pip install moviepy librosa piano_transcription_inference; sudo apt-get instsudo apt-get install ffmpeg
 import math
+import os
 import os.path
 from multiprocessing import Pool
 
@@ -163,7 +164,7 @@ from pytube import YouTube
 from moviepy.editor import *
 
 
-def download_youtube_video_as_mp3(url, path):
+def download_youtube_video_as_mp3(url, path, start_time = None, end_time = None):
     """
     Download a video from a YouTube URL and save it as an MP3 file in the specified path.
 
@@ -176,6 +177,10 @@ def download_youtube_video_as_mp3(url, path):
 
     # Get the highest quality audio stream available
     video = yt.streams.filter(only_audio=True).first()
+    
+    # Set the start and end time if provided
+    if start_time is not None and end_time is not None:
+        video = video.subclip(start_time, end_time)
 
     # Download the audio stream
     out_file = video.download(output_path=f"tmp/{path}")
@@ -257,30 +262,24 @@ def downsample_cqt(path_mel, to_save, fs):
 
 if __name__ == '__main__':
     fs = 5
-    data = load_json("hidden_voices.json")
+    for file_name in tqdm(os.listdir("benchmark_multiperformances")):
+        if file_name.endswith(".json"):
+            data = load_json(f"benchmark_multiperformances/{file_name}")
 
-    for idx, dd in data.items():
-        print(dd["video_url"])
-        # download the video from youtube and save into mp3
-        if not os.path.exists(f"multi/mp3/{idx}.mp3"):
-            download_youtube_video_as_mp3(dd["video_url"], f"multi/mp3/{idx}.mp3")
-        # transcribe midi from audio with Kong et al (tiktok)
-        if not os.path.exists(f"multi/midi/{idx}.mid"):
-            extract_midi(f"multi/mp3/{idx}.mp3", f"multi/midi/{idx}.mid")
-        # pianoroll from midi
-        if not os.path.exists(f"multi/mel/{idx}.bin"):
-            convert2pianoroll(f"multi/midi/{idx}.mid", f"multi/pr{fs}/{idx}.bin", dd, fs)
-        # cqt from mp3
-        if not os.path.exists(f"multi/cqt_full/{idx}.bin"):
-            extract_cqt_full(f"multi/mp3/{idx}.mp3", f"multi/cqt_full/{idx}.bin", dd)
-        # downsample cqt
-        if not os.path.exists(f"multi/cqt{fs}/{idx}.bin"):
-            downsample_cqt(f"multi/cqt_full/{idx}.bin", f"multi/cqt{fs}/{idx}.bin", fs)
-
-
-
-
-
-
-
-
+        for idx, dd in data.items():
+            print(dd["video_url"])
+            # download the video from youtube and save into mp3
+            if not os.path.exists(f"multi/mp3/{idx}.mp3"):
+                download_youtube_video_as_mp3(dd["video_url"], f"multi/mp3/{idx}.mp3")
+            # transcribe midi from audio with Kong et al (tiktok)
+            if not os.path.exists(f"multi/midi/{idx}.mid"):
+                extract_midi(f"multi/mp3/{idx}.mp3", f"multi/midi/{idx}.mid")
+            # pianoroll from midi
+            if not os.path.exists(f"multi/mel/{idx}.bin"):
+                convert2pianoroll(f"multi/midi/{idx}.mid", f"multi/pr{fs}/{idx}.bin", dd, fs)
+            # cqt from mp3
+            if not os.path.exists(f"multi/cqt_full/{idx}.bin"):
+                extract_cqt_full(f"multi/mp3/{idx}.mp3", f"multi/cqt_full/{idx}.bin", dd)
+            # downsample cqt
+            if not os.path.exists(f"multi/cqt{fs}/{idx}.bin"):
+                downsample_cqt(f"multi/cqt_full/{idx}.bin", f"multi/cqt{fs}/{idx}.bin", fs)
