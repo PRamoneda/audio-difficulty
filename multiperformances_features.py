@@ -263,14 +263,17 @@ def downsample_cqt(path_mel, to_save, fs):
 if __name__ == '__main__':
     fs = 5
     for file_name in tqdm(os.listdir("benchmark_multiperformances")):
-        if file_name.endswith(".json"):
-            data = load_json(f"benchmark_multiperformances/{file_name}")
+        if not file_name.endswith(".json"):
+            continue
+        
+        data = load_json(f"benchmark_multiperformances/{file_name}")
+        piece_index = file_name.replace(".json", "")
 
         for idx, dd in data.items():
-            print(dd["video_url"])
+            idx = piece_index + "_" + idx
             # download the video from youtube and save into mp3
             if not os.path.exists(f"multi/mp3/{idx}.mp3"):
-                download_youtube_video_as_mp3(dd["video_url"], f"multi/mp3/{idx}.mp3")
+                download_youtube_video_as_mp3(dd["youtube_url"], f"multi/mp3/{idx}.mp3")
             # transcribe midi from audio with Kong et al (tiktok)
             if not os.path.exists(f"multi/midi/{idx}.mid"):
                 extract_midi(f"multi/mp3/{idx}.mp3", f"multi/midi/{idx}.mid")
