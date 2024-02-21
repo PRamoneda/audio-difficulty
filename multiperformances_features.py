@@ -12,6 +12,7 @@ from piano_transcription_inference import PianoTranscription, sample_rate, load_
 import pretty_midi
 import numpy as np
 from tqdm import tqdm
+import logging
 
 from get_cqt import extract_mel, extract_mel_v2
 from utils import load_binary
@@ -176,16 +177,20 @@ def download_youtube_video_as_mp3(url, path, start_time, end_time):
     yt = YouTube(url)
 
     # Get the highest quality audio stream available
-    video = yt.streams.filter(only_audio=True).first()
-    
-    # Set the start and end time if provided
-    video = video.subclip(float(start_time), float(end_time))
+    try:
+        video = yt.streams.filter(only_audio=True).first()
+    except Exception as e:
+        logging.exception(f"Error downloading {url}: {e}")
+        return
 
     # Download the audio stream
     out_file = video.download(output_path=f"tmp/{path}")
 
     # Load the downloaded audio file
     mp3_file = AudioFileClip(out_file)
+    
+    # Set the start and end time if provided
+    mp3_file = mp3_file.subclip(float(start_time), float(end_time))
 
     # Save the audio as an MP3 file
     mp3_filename = out_file.split("\\")[-1].replace(".mp4", ".mp3")
@@ -193,9 +198,6 @@ def download_youtube_video_as_mp3(url, path, start_time, end_time):
 
     # Optionally, remove the original download if it's not in MP3 format
     os.remove(out_file)
-
-    print(f"Video downloaded and converted to MP3 successfully, saved to {path}/{mp3_filename}")
-
 
 
 def extract_cqt_full(path_mp3, path_mel, metadata):
@@ -260,6 +262,7 @@ def downsample_cqt(path_mel, to_save, fs):
 
 
 if __name__ == '__main__':
+    logging.basicConfig(level=logging.ERROR, filename="multiperformances.log")
     fs = 5
 
     dir_names = ["multi/mp3", "multi/midi", f"multi/pr{fs}", f"multi/cqt{fs}", "multi/cqt_full"]
@@ -275,10 +278,13 @@ if __name__ == '__main__':
         piece_index = file_name.replace(".json", "")
 
         for idx, dd in data.items():
-            idx = piece_index + "_" + idx
+            idx = piece_index + ":" + idx
             # download the video from youtube and save into mp3
             if not os.path.exists(f"multi/mp3/{idx}.mp3"):
                 download_youtube_video_as_mp3(dd["youtube_url"], f"multi/mp3/{idx}.mp3", dd["start_time"], dd["end_time"])
+                if not os.path.exists(f"multi/mp3/{idx}.mp3"):
+                    continue
+
             # transcribe midi from audio with Kong et al (tiktok)
             if not os.path.exists(f"multi/midi/{idx}.mid"):
                 extract_midi(f"multi/mp3/{idx}.mp3", f"multi/midi/{idx}.mid")
