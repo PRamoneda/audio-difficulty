@@ -13,6 +13,7 @@ import pretty_midi
 import numpy as np
 from tqdm import tqdm
 import logging
+import unicodedata
 
 import utils
 from get_cqt import extract_mel, extract_mel_v2, load_json, save_binary
@@ -41,7 +42,7 @@ def get_pianoroll(rep, k):
 
 
 def compute_multi(rep, mode="basic"):
-    fs = 5
+    print(f"Computing {rep} {mode}")
     benchmark_data = load_json("benchmark_data.json")
 
     for split in range(5):
@@ -57,35 +58,33 @@ def compute_multi(rep, mode="basic"):
         model.eval()
         with torch.inference_mode():
             save = {}
+            for file_name in tqdm(os.listdir("benchmark_multiperformances")):
+                if not file_name.endswith(".json"):
+                    continue
 
-        for file_name in tqdm(os.listdir("benchmark_multiperformances")):
-            if not file_name.endswith(".json"):
-                continue
-
-            data = load_json(f"benchmark_multiperformances/{file_name}")
-            piece_name = file_name.replace(".json", "")
-            for k in data.keys():
-                k = piece_name + ":" + k
-                inp_data = None
-                if "cqt" in rep:
-                    inp_data = get_cqt("cqt5", k)
-                elif "pianoroll" in rep or "pr" in rep:
-                    inp_data = get_pianoroll("pr5", k)
-                elif "multi" in rep and "multirank" not in rep:
-                    x1 = get_pianoroll("pr5", k)
-                    x2 = get_cqt("cqt5", k)[:, :, :x1.shape[2]]
-                    inp_data = [x1, x2]
-                log_prob = model(inp_data, None)
-                if mode == "multirank" or mode == "era":
-                    log_prob = log_prob[0]
-                pred = prediction2label(log_prob).cpu().tolist()[0]
-                save[k] = {
-                    "log_prob": log_prob.cpu().tolist(),
-                    "pred": pred,
-                    "true": benchmark_data[piece_name]["ps_rating"]
-                }
-                print("pred", pred)
-            save_binary(save, f"multi/logits/{rep}_split_{split}.bin")
+                data = load_json(f"benchmark_multiperformances/{file_name}")
+                piece_name = file_name.replace(".json", "")
+                for k in data.keys():
+                    k = piece_name + ":" + k
+                    inp_data = None
+                    if "cqt" in rep:
+                        inp_data = get_cqt("cqt5", k)
+                    elif "pianoroll" in rep or "pr" in rep:
+                        inp_data = get_pianoroll("pr5", k)
+                    elif "multi" in rep and "multirank" not in rep:
+                        x1 = get_pianoroll("pr5", k)
+                        x2 = get_cqt("cqt5", k)[:, :, :x1.shape[2]]
+                        inp_data = [x1, x2]
+                    log_prob = model(inp_data, None)
+                    if mode == "multirank" or mode == "era":
+                        log_prob = log_prob[0]
+                    pred = prediction2label(log_prob).cpu().tolist()[0]
+                    save[k] = {
+                        "log_prob": log_prob.cpu().tolist(),
+                        "pred": pred,
+                        "true": benchmark_data[unicodedata.normalize('NFC', piece_name)]["ps_rating"]
+                    }
+                save_binary(save, f"multi/logits/{rep}_split_{split}.bin")
 
 
 def init(inference_type):
