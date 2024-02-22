@@ -54,8 +54,9 @@ def save_binary(data, path):
 
 
 def extract_midi(path_mp3, path_midi):
+    assert os.path.exists(path_mp3), f"File {path_mp3} does not exist"
     # Load audio
-    (audio, _) = load_audio(path_mp3, sr=sample_rate, mono=True)
+    (audio, _) = librosa.load(path_mp3, sr=sample_rate, mono=True)
     # Transcriptor
     transcriptor = PianoTranscription(device='cuda:0', checkpoint_path=None)  # device: 'cuda' | 'cpu'
     # Transcribe and write out to MIDI file
@@ -154,9 +155,20 @@ def download_youtube_video_as_mp3(url, file_name, start_time, end_time):
     try:
         # Try downloading with pytube
         yt = YouTube(url)
+
+        # Get the highest quality audio stream available
         video = yt.streams.filter(only_audio=True).first()
-        video.download(output_path=tmp_mp3_file_name)
+
+        # Download the audio stream
+        out_file = video.download(filename=tmp_mp3_file_name[:-4]+'.mp4')
+        # Load the downloaded audio file
+        audio_clip = AudioFileClip(out_file)
+        # Remove the created mp4 file
+        os.remove(out_file)
+        
+        
     except Exception as e:
+        logging.exception(f"pytube failed. Error: {e}")
         try:
             # Setup yt-dlp options for downloading audio
             ydl_opts = {
@@ -172,13 +184,12 @@ def download_youtube_video_as_mp3(url, file_name, start_time, end_time):
             # Use yt-dlp to download the audio
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                 ydl.download([url])
+            # Load the downloaded MP3 file
+            audio_clip = AudioFileClip(tmp_mp3_file_name)
 
         except Exception as e:
             logging.exception(f"yt-dlp failed. Error: {e}")
             return
-
-    # Load the downloaded MP3 file
-    audio_clip = AudioFileClip(tmp_mp3_file_name)
     
     # Set the start and end time if provided, ensure they are within the duration
     end_time = min(end_time, audio_clip.duration)
@@ -236,20 +247,19 @@ def downsample_cqt(path_mel, to_save, fs):
     save_binary(new_mel.T, to_save)
 
 
-if __name__ == '__main__':
-    # Clear the log file
+def init():
     log_file = "multiperformances.log"
-    if os.path.exists(log_file):
-        os.remove(log_file)
+    with open(log_file, "w") as file:
+        logging.basicConfig(level=logging.ERROR, filename=log_file)
 
-    # Configure logging
-    logging.basicConfig(level=logging.ERROR, filename=log_file)
-    fs = 5
-
-    dir_names = ["{MP3_PATH}", "{MIDI_PATH}", f"{PR_PATH}", f"{CQT_PATH}", "{CQT_FULL_PATH}"]
+    dir_names = [MP3_PATH, MIDI_PATH, PR_PATH, CQT_PATH, CQT_FULL_PATH, "tmp"]
     for dir_name in dir_names:
         if not os.path.exists(dir_name):
             os.makedirs(dir_name)
+
+
+if __name__ == '__main__':
+    init()
 
     for file_name in tqdm(os.listdir("benchmark_multiperformances")):
         if not file_name.endswith(".json"):
@@ -271,10 +281,10 @@ if __name__ == '__main__':
                 extract_midi(mp3_fn, midi_fn)
             # pianoroll from midi
             if not os.path.exists(pr_fn):
-                convert2pianoroll(midi_fn, pr_fn, dd, fs)
+                convert2pianoroll(midi_fn, pr_fn, dd, FS)
             # cqt from mp3
             if not os.path.exists(cqt_full_fn):
                 extract_cqt_full(mp3_fn, cqt_full_fn, dd)
             # downsample cqt
             if not os.path.exists(cqt_fn):
-                downsample_cqt(cqt_full_fn, cqt_fn, fs)
+                downsample_cqt(cqt_full_fn, cqt_fn, FS)
