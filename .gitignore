@@ -1,4 +1,5 @@
 benchmark_multiperformances
 multi
+*.log
 
 __pycache__/
