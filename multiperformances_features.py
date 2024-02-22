@@ -98,7 +98,6 @@ def convert2pianoroll(path_midi, path_pianoroll, metadata, fs):
     piano_roll = midi_data.get_piano_roll(fs=fs)
     #reduce to 88 keys
     piano_roll = piano_roll[21:109].transpose()
-    print(path_pianoroll, piano_roll.shape)
     # normalize pianoroll
     piano_roll = piano_roll / 127
     # get onset matrix
@@ -110,19 +109,16 @@ def convert2pianoroll(path_midi, path_pianoroll, metadata, fs):
         end = int(end * fs)
         piano_roll = piano_roll[start:end]
         onset_matrix = onset_matrix[start:end]
-        print("start and end")
     elif "only_start" in metadata.keys():
         start = metadata["only_start"]
         start = int(start * fs)
         piano_roll = piano_roll[start:]
         onset_matrix = onset_matrix[start:]
-        print("only start")
     elif "only_end" in metadata.keys():
         end = metadata["only_end"]
         end = int(end * fs)
         piano_roll = piano_roll[:end]
         onset_matrix = onset_matrix[:end]
-        print("only end")
     # save pianoroll
     save_binary(piano_roll, path_pianoroll)
     # save onset matrix
@@ -131,7 +127,6 @@ def convert2pianoroll(path_midi, path_pianoroll, metadata, fs):
 
 def process_video(arguments):
     url_youtube, path_video, path_mp3, path_mel, path_midi = arguments
-    print(path_mp3)
     # extract_mel(path_mp3, path_mel)
     extract_midi(path_mp3, path_midi)
     path_bin_process = path_midi.replace(".mid", ".bin").replace("midi/", "pianoroll/")
@@ -231,7 +226,6 @@ def extract_cqt_full(path_mp3, path_mel, metadata):
         log_mel_spectrogram = log_mel_spectrogram[:end_frame]
 
     # Save the log Mel spectrogram
-    print(log_mel_spectrogram.shape)
     save_binary(log_mel_spectrogram, path_mel)
 
 def downsample_log_mel_spectrogram(log_mel_spectrogram, target_fs):
@@ -256,10 +250,8 @@ def downsample_log_mel_spectrogram(log_mel_spectrogram, target_fs):
 
 
 def downsample_cqt(path_mel, to_save, fs):
-    print(path_mel)
     mel = load_binary(path_mel)
     new_mel = downsample_log_mel_spectrogram(mel, fs)
-    print(new_mel.shape)
     save_binary(new_mel.T, to_save)
 
 
