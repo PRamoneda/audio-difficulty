@@ -85,7 +85,7 @@ def compute_multi(rep, mode="basic"):
                     "true": benchmark_data[piece_name]["ps_rating"]
                 }
                 print("pred", pred)
-            save_binary(save, f"{DIR_DICT['logits']}/{rep}_split_{split}.bin")
+            save_binary(save, f"multi/logits/{rep}_split_{split}.bin")
 
 
 def init(inference_type):
@@ -94,7 +94,7 @@ def init(inference_type):
     with open(log_file, "w") as file:
         logging.basicConfig(level=logging.ERROR, filename=log_file)
 
-    # create directories
+    # TODO(minigb): Make this dir_dict to be sharable
     dir_dict = {
         'logits': f'{inference_type}/logits'
     }
@@ -103,11 +103,9 @@ def init(inference_type):
         if not os.path.exists(dir_path):
             os.makedirs(dir_path)
 
-    return dir_dict
-
 
 if __name__ == '__main__':
-    dir_dict = init('multi')
+    init('multi')
 
     # cqt5
     compute_multi("audio_midi_cqt5_ps_v5", mode="basic")
