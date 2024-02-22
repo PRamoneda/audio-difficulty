@@ -1,5 +1,6 @@
 benchmark_multiperformances
 multi
 *.log
+*/logits/*
 
 __pycache__/
