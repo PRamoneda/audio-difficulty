@@ -18,6 +18,9 @@ from utils import *
 from scipy.signal import resample
 
 
+DIR_DICT = {}
+
+
 def extract_midi(path_mp3, path_midi):
     assert os.path.exists(path_mp3), f"File {path_mp3} does not exist"
     # Load audio
@@ -207,11 +210,11 @@ def downsample_cqt(path_mel, to_save, fs):
 
 def init(inference_type, fs):
     # init logging
-    log_file = f"{inference_type}.log"
+    log_file = f"{inference_type}_features.log"
     with open(log_file, "w") as file:
         logging.basicConfig(level=logging.ERROR, filename=log_file)
 
-    dir_dict = {
+    DIR_DICT = {
         'mp3': f'{inference_type}/mp3',
         'midi': f'{inference_type}/midi',
         'pr': f'{inference_type}/pr{fs}',
@@ -220,16 +223,27 @@ def init(inference_type, fs):
         'tmp': 'tmp'
     }
 
-    for dir_path in dir_dict.values():
+    for dir_path in DIR_DICT.values():
         if not os.path.exists(dir_path):
             os.makedirs(dir_path)
 
-    return dir_dict
+
+
+def get_filenames(idx, piece_index):
+    idx = piece_index + ":" + idx
+    mp3_fn = f"{DIR_DICT['mp3']}/{idx}.mp3"
+    midi_fn = f"{DIR_DICT['midi']}/{idx}.mid"
+    pr_fn = f"{DIR_DICT['pr']}/{idx}.bin"
+    cqt_fn = f"{DIR_DICT['cqt']}/{idx}.bin"
+    cqt_full_fn = f"{DIR_DICT['cqt_full']}/{idx}.bin"
+
+
+    return idx, mp3_fn, midi_fn, pr_fn, cqt_fn, cqt_full_fn
 
 
 if __name__ == '__main__':
     fs = 5
-    dir_dict = init('multi', 5)
+    init('multi', 5)
 
     for file_name in tqdm(os.listdir("benchmark_multiperformances")):
         if not file_name.endswith(".json"):
@@ -239,7 +253,7 @@ if __name__ == '__main__':
         piece_index = file_name.replace(".json", "")
 
         for idx, dd in data.items():
-            idx, mp3_fn, midi_fn, pr_fn, cqt_fn, cqt_full_fn = get_filenames(dir_dict, idx, piece_index)
+            idx, mp3_fn, midi_fn, pr_fn, cqt_fn, cqt_full_fn = get_filenames(idx, piece_index)
 
             # download the video from youtube and save into mp3
             if not os.path.exists(mp3_fn):

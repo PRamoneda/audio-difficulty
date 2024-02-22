@@ -48,15 +48,3 @@ def remove_strange_characters(string):
         string = string.replace(character, "")
         
     return string
-
-
-def get_filenames(dir_dict, idx, piece_index):
-    idx = piece_index + ":" + idx
-    mp3_fn = f"{dir_dict['mp3']}/{idx}.mp3"
-    midi_fn = f"{dir_dict['midi']}/{idx}.mid"
-    pr_fn = f"{dir_dict['pr']}/{idx}.bin"
-    cqt_fn = f"{dir_dict['cqt']}/{idx}.bin"
-    cqt_full_fn = f"{dir_dict['cqt_full']}/{idx}.bin"
-
-
-    return idx, mp3_fn, midi_fn, pr_fn, cqt_fn, cqt_full_fn

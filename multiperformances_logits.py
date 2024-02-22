@@ -12,6 +12,7 @@ from piano_transcription_inference import PianoTranscription, sample_rate, load_
 import pretty_midi
 import numpy as np
 from tqdm import tqdm
+import logging
 
 import utils
 from get_cqt import extract_mel, extract_mel_v2, load_json, save_binary
@@ -38,9 +39,10 @@ def get_pianoroll(rep, k):
     inp_data = inp_data.unsqueeze(0).permute(0, 2, 1, 3)
     return inp_data
 
-def compute_hv(rep, mode="basic"):
+
+def compute_multi(rep, mode="basic"):
     fs = 5
-    data = load_json("hidden_voices.json")
+    benchmark_data = load_json("benchmark_data.json")
 
     for split in range(5):
         if mode == "basic":
@@ -53,9 +55,18 @@ def compute_hv(rep, mode="basic"):
         model.load_state_dict(checkpoint['model_state_dict'])
         model = model.cuda()
         model.eval()
-        save = {}
         with torch.inference_mode():
-            for k, dd in data.items():
+            save = {}
+
+        for file_name in tqdm(os.listdir("benchmark_multiperformances")):
+            if not file_name.endswith(".json"):
+                continue
+
+            data = load_json(f"benchmark_multiperformances/{file_name}")
+            piece_name = file_name.replace(".json", "")
+            for k in data.keys():
+                k = piece_name + ":" + k
+                inp_data = None
                 if "cqt" in rep:
                     inp_data = get_cqt("cqt5", k)
                 elif "pianoroll" in rep or "pr" in rep:
@@ -71,35 +82,42 @@ def compute_hv(rep, mode="basic"):
                 save[k] = {
                     "log_prob": log_prob.cpu().tolist(),
                     "pred": pred,
-                    "true": dd["grade_num"]
+                    "true": benchmark_data[piece_name]["ps_rating"]
                 }
                 print("pred", pred)
-            save_binary(save, f"multi/logits/{rep}_split_{split}.bin")
+            save_binary(save, f"{DIR_DICT['logits']}/{rep}_split_{split}.bin")
 
 
+def init(inference_type):
+    # init logging
+    log_file = f"{inference_type}_logits.log"
+    with open(log_file, "w") as file:
+        logging.basicConfig(level=logging.ERROR, filename=log_file)
 
+    # create directories
+    dir_dict = {
+        'logits': f'{inference_type}/logits'
+    }
+
+    for dir_path in dir_dict.values():
+        if not os.path.exists(dir_path):
+            os.makedirs(dir_path)
+
+    return dir_dict
 
 
 if __name__ == '__main__':
+    dir_dict = init('multi')
+
     # cqt5
-    compute_hv("audio_midi_cqt5_ps_v5", mode="basic")
+    compute_multi("audio_midi_cqt5_ps_v5", mode="basic")
     # pr5
-    compute_hv("audio_midi_pianoroll_ps_5_v4", mode="basic")
+    compute_multi("audio_midi_pianoroll_ps_5_v4", mode="basic")
     # mm5
-    compute_hv("audio_midi_multi_ps_v5", mode="basic")
+    compute_multi("audio_midi_multi_ps_v5", mode="basic")
     # multirank5
-    compute_hv("audio_midi_cqt5multiranking_v10", mode="multirank")
-    compute_hv("audio_midi_pr5multiranking_v10", mode="multirank")
+    compute_multi("audio_midi_cqt5multiranking_v10", mode="multirank")
+    compute_multi("audio_midi_pr5multiranking_v10", mode="multirank")
     # era
-    compute_hv("audio_midi_cqt5era_v1", mode="era")
-    compute_hv("audio_midi_pr5era_v1", mode="era")
-
-
-
-
-
-
-
-
-
-
+    compute_multi("audio_midi_cqt5era_v1", mode="era")
+    compute_multi("audio_midi_pr5era_v1", mode="era")
