@@ -6,6 +6,7 @@ from multiprocessing import Pool
 
 from pytube import YouTube
 from moviepy.editor import VideoFileClip
+import yt_dlp
 
 import librosa
 from piano_transcription_inference import PianoTranscription, sample_rate, load_audio
@@ -162,40 +163,63 @@ from moviepy.editor import *
 
 def download_youtube_video_as_mp3(url, path, start_time, end_time):
     """
-    Download a video from a YouTube URL and save it as an MP3 file in the specified path.
+    Download a video from a YouTube URL and save it as an MP3 file in the specified path. It first tries using pytube,
+    and if it fails, it falls back to yt-dlp.
 
     Parameters:
     - url: The YouTube URL of the video to download.
     - path: The directory path where the MP3 file will be saved.
+    - start_time: The start time in seconds from where the audio should be trimmed.
+    - end_time: The end time in seconds to where the audio should be trimmed.
     """
-    # Create a YouTube object with the URL
-    yt = YouTube(url)
-
-    # Get the highest quality audio stream available
     try:
+        # Try downloading with pytube
+        yt = YouTube(url)
         video = yt.streams.filter(only_audio=True).first()
+        out_file = video.download(output_path=f"tmp/{path}")
+        mp3_file_path = out_file.replace(".mp4", ".mp3")
+        
+        # Rename the file to have a .mp3 extension
+        os.rename(out_file, mp3_file_path)
     except Exception as e:
-        logging.exception(f"Error downloading {url}: {e}")
-        return
+        logging.exception(f"pytube failed, attempting with yt-dlp. Error: {e}")
+        # Setup yt-dlp options for downloading audio
+        ydl_opts = {
+            'format': 'bestaudio/best',
+            'postprocessors': [{
+                'key': 'FFmpegExtractAudio',
+                'preferredcodec': 'mp3',
+                'preferredquality': '192',
+            }],
+            'outtmpl': f'tmp/{path}/%(title)s.%(ext)s',  # Save in tmp/path with title as filename
+        }
 
-    # Download the audio stream
-    out_file = video.download(output_path=f"tmp/{path}")
+        # Use yt-dlp to download the audio
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            ydl.download([url])
 
-    # Load the downloaded audio file
-    mp3_file = AudioFileClip(out_file)
+        # Find the downloaded MP3 file
+        for file in os.listdir(f'tmp/{path}'):
+            if file.endswith('.mp3'):
+                mp3_file_path = os.path.join(f'tmp/{path}', file)
+                break
+
+    # Load the downloaded MP3 file
+    audio_clip = AudioFileClip(mp3_file_path)
     
-    # Set the start and end time if provided
-    end_time = min(end_time, mp3_file.duration)
-    assert start_time < end_time <= mp3_file.duration, f"Invalid start and end times: {start_time}, {end_time}, {mp3_file.duration}"
-    mp3_file = mp3_file.subclip(float(start_time), float(end_time))
+    # Set the start and end time if provided, ensure they are within the duration
+    end_time = min(end_time, audio_clip.duration)
+    assert start_time < end_time <= audio_clip.duration, f"Invalid start and end times: {start_time}, {end_time}, {audio_clip.duration}"
+    
+    # Trim the audio file
+    trimmed_audio = audio_clip.subclip(start_time, end_time)
 
-    # Save the audio as an MP3 file
-    mp3_filename = out_file.split("\\")[-1].replace(".mp4", ".mp3")
-    mp3_file.write_audiofile(path)
+    # Save the trimmed audio as an MP3 file
+    trimmed_audio.write_audiofile(mp3_file_path)
 
-    # Optionally, remove the original download if it's not in MP3 format
-    os.remove(out_file)
-
+    # Close the audio file to free resources
+    audio_clip.close()
+    trimmed_audio.close()
 
 def extract_cqt_full(path_mp3, path_mel, metadata):
     # Load the audio at a sampling rate of 44100 Hz
