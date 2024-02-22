@@ -25,8 +25,31 @@ def mean_std(data):
 
 
 def print_for_paper(result):
-    for model_type, data in result.items():
-        print(f"{model_type} & {data['mean']:.4f} & {data['std']:.4f} \\\\")
+    model_type_dict = {
+        # single task
+        'audio_midi_cqt5_ps_v5' : 'CQT5',
+        'audio_midi_pianoroll_ps_5_v4' : 'PR5',
+        'audio_midi_multi_ps_v5' : "MM",
+
+        # multi task with era
+        'audio_midi_cqt5era_v1' : 'CQT5',
+        'audio_midi_pr5era_v1' : 'PR5',
+
+        # multi task with multi ranking
+        'audio_midi_cqt5multiranking_v10' : 'CQT5',
+        'audio_midi_pr5multiranking_v10' : 'PR5'
+    }
+
+    model_types = list(model_type_dict.keys())
+    assert len(model_types) == len(result), f"{len(model_types)} != {len(result)}"
+    assert set(model_types) == set(result.keys()), f"{model_types} != {set(result.keys())}"
+
+    for model_type in model_types:
+        data = result[model_type]
+        formatted_mean = f"{data['mean']:.3f}".lstrip('0')
+        formatted_std = f"{data['std']:.3f}".lstrip('0')
+
+        print(f"& {model_type_dict[model_type]}$_{{5}}$ & {formatted_mean} ({formatted_std}) \\\\")
 
 
 if __name__ == "__main__":
