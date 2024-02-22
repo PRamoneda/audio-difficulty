@@ -1,7 +1,5 @@
 import json
 import pickle
-import logging
-import os
 
 
 def load_json(name_file):
