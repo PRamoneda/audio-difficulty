@@ -56,8 +56,8 @@ def compute_multi(rep, mode="basic"):
         model.load_state_dict(checkpoint['model_state_dict'])
         model = model.cuda()
         model.eval()
+        save = {}
         with torch.inference_mode():
-            save = {}
             for file_name in tqdm(os.listdir("benchmark_multiperformances")):
                 if not file_name.endswith(".json"):
                     continue
@@ -66,7 +66,6 @@ def compute_multi(rep, mode="basic"):
                 piece_name = file_name.replace(".json", "")
                 for k in data.keys():
                     k = piece_name + ":" + k
-                    inp_data = None
                     if "cqt" in rep:
                         inp_data = get_cqt("cqt5", k)
                     elif "pianoroll" in rep or "pr" in rep:
