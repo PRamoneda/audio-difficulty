@@ -19,35 +19,12 @@ from scipy.signal import resample
 
 
 def remove_strange_characters(string):
-    string = string.replace("#", "")
-    string = string.replace("'", "")
-    string = string.replace('"', "")
-    string = string.replace('?', "")
-    string = string.replace("!", "")
-    string = string.replace("_", " ")
-    string = string.replace("\u2013", "")
-    string = string.replace("/", "")
-    string = string.replace(":", "")
-    string = string.replace("&", "")
-    string = string.replace("[", "")
-    string = string.replace("]", "")
-    string = string.replace("\u00ef", "")
-    string = string.replace("\u00ea", "")
-    string = string.replace("\u00e9", "")
-    string = string.replace("\u00c9", "")
-    string = string.replace("\u2014", "")
-    string = string.replace("\u201c", "")
-    string = string.replace("\u201d", "")
-    string = string.replace("\u00b4", "")
-    string = string.replace("\u00ed", "")
-    string = string.replace("\u00e8", "")
-    string = string.replace("\u00ed", "")
-    string = string.replace("\u2018", "")
-    string = string.replace("\u00c5", "")
-    string = string.replace("\u0002", "")
-    string = string.replace("\u00e1", "")
-    string = string.replace("\u00f3", "")
-    string = string.replace("\u2019", "")
+    strange_characters = ["#", "'", '"', '?', '!', "_", "\u2013", "/", ":", "&", "[", "]", "\u00ef", "\u00ea", "\u00e9",
+                         "\u00c9", "\u2014", "\u201c", "\u201d", "\u00b4", "\u00ed", "\u00e8", "\u00ed", "\u2018",
+                         "\u00c5", "\u0002", "\u00e1", "\u00f3", "\u2019"]
+    for character in strange_characters:
+        string = string.replace(character, "")
+        
     return string
 
 def save_binary(data, path):
