@@ -17,20 +17,41 @@ import logging
 from utils import load_binary
 from scipy.signal import resample
 
+# Constants
+FS = 5
+STRANGE_CHARACTERS = ["#", "'", '"', '?', '!', "_", "\u2013", "/", ":", "&", "[", "]", "\u00ef", "\u00ea", "\u00e9",
+                        "\u00c9", "\u2014", "\u201c", "\u201d", "\u00b4", "\u00ed", "\u00e8", "\u00ed", "\u2018", "\u00c5",
+                        "\u0002", "\u00e1", "\u00f3", "\u2019"]
+MP3_PATH = "multi/mp3"
+MIDI_PATH = "multi/midi"
+PR_PATH = f"multi/pr{FS}"
+CQT_PATH = f"multi/cqt{FS}"
+CQT_FULL_PATH = "multi/cqt_full"
+
 
 def remove_strange_characters(string):
-    strange_characters = ["#", "'", '"', '?', '!', "_", "\u2013", "/", ":", "&", "[", "]", "\u00ef", "\u00ea", "\u00e9",
-                         "\u00c9", "\u2014", "\u201c", "\u201d", "\u00b4", "\u00ed", "\u00e8", "\u00ed", "\u2018",
-                         "\u00c5", "\u0002", "\u00e1", "\u00f3", "\u2019"]
-    for character in strange_characters:
+    for character in STRANGE_CHARACTERS:
         string = string.replace(character, "")
         
     return string
+
+
+def get_filenames(idx, piece_index):
+    idx = piece_index + ":" + idx
+    mp3_fn = f"{MP3_PATH}/{idx}.mp3"
+    midi_fn = f"{MIDI_PATH}/{idx}.mid"
+    pr_fn = f"{PR_PATH}/{idx}.bin"
+    cqt_fn = f"{CQT_PATH}/{idx}.bin"
+    cqt_full_fn = f"{CQT_FULL_PATH}/{idx}.bin"
+
+    return idx, mp3_fn, midi_fn, pr_fn, cqt_fn, cqt_full_fn
+
 
 def save_binary(data, path):
     import pickle
     with open(path, 'wb') as fp:
         pickle.dump(data, fp)
+
 
 def extract_midi(path_mp3, path_midi):
     # Load audio
@@ -125,21 +146,17 @@ def download_youtube_video_as_mp3(url, file_name, start_time, end_time):
 
     Parameters:
     - url: The YouTube URL of the video to download.
-    - file_name: The directory path where the MP3 file will be saved.
+    - file_name: The file name with .mp3 extension to save the audio.
     - start_time: The start time in seconds from where the audio should be trimmed.
     - end_time: The end time in seconds to where the audio should be trimmed.
     """
+    tmp_mp3_file_name = f'tmp/{file_name}' # Ends with .mp3
     try:
         # Try downloading with pytube
         yt = YouTube(url)
         video = yt.streams.filter(only_audio=True).first()
-        out_file = video.download(output_path=f"tmp/{file_name}")
-        mp3_file_path = out_file.replace(".mp4", ".mp3")
-        
-        # Rename the file to have a .mp3 extension
-        os.rename(out_file, mp3_file_path)
+        video.download(output_path=tmp_mp3_file_name)
     except Exception as e:
-        logging.exception(f"pytube failed. Error: {e}")
         try:
             # Setup yt-dlp options for downloading audio
             ydl_opts = {
@@ -149,24 +166,19 @@ def download_youtube_video_as_mp3(url, file_name, start_time, end_time):
                     'preferredcodec': 'mp3',
                     'preferredquality': '192',
                 }],
-                'outtmpl': f'tmp/{file_name[:-4]}',
+                'outtmpl': f'{tmp_mp3_file_name[:-4]}.%(ext)s',
             }
 
             # Use yt-dlp to download the audio
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                 ydl.download([url])
 
-            # Find the downloaded MP3 file
-            for file in os.listdir(f'tmp/{file_name}'):
-                if file.endswith('.mp3'):
-                    mp3_file_path = os.path.join(f'tmp/{file_name}', file)
-                    break
         except Exception as e:
             logging.exception(f"yt-dlp failed. Error: {e}")
             return
 
     # Load the downloaded MP3 file
-    audio_clip = AudioFileClip(mp3_file_path)
+    audio_clip = AudioFileClip(tmp_mp3_file_name)
     
     # Set the start and end time if provided, ensure they are within the duration
     end_time = min(end_time, audio_clip.duration)
@@ -176,7 +188,7 @@ def download_youtube_video_as_mp3(url, file_name, start_time, end_time):
     trimmed_audio = audio_clip.subclip(start_time, end_time)
 
     # Save the trimmed audio as an MP3 file
-    trimmed_audio.write_audiofile(mp3_file_path)
+    trimmed_audio.write_audiofile(file_name)
 
     # Close the audio file to free resources
     audio_clip.close()
@@ -234,7 +246,7 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.ERROR, filename=log_file)
     fs = 5
 
-    dir_names = ["multi/mp3", "multi/midi", f"multi/pr{fs}", f"multi/cqt{fs}", "multi/cqt_full"]
+    dir_names = ["{MP3_PATH}", "{MIDI_PATH}", f"{PR_PATH}", f"{CQT_PATH}", "{CQT_FULL_PATH}"]
     for dir_name in dir_names:
         if not os.path.exists(dir_name):
             os.makedirs(dir_name)
@@ -247,22 +259,22 @@ if __name__ == '__main__':
         piece_index = file_name.replace(".json", "")
 
         for idx, dd in data.items():
-            idx = piece_index + ":" + idx
-            # download the video from youtube and save into mp3
-            if not os.path.exists(f"multi/mp3/{idx}.mp3"):
-                download_youtube_video_as_mp3(dd["youtube_url"], f"multi/mp3/{idx}.mp3", dd["start_time"], dd["end_time"])
-                if not os.path.exists(f"multi/mp3/{idx}.mp3"):
-                    continue
+            idx, mp3_fn, midi_fn, pr_fn, cqt_fn, cqt_full_fn = get_filenames(idx, piece_index)
 
+            # download the video from youtube and save into mp3
+            if not os.path.exists(mp3_fn):
+                download_youtube_video_as_mp3(dd["youtube_url"], mp3_fn, dd["start_time"], dd["end_time"])
+                if not os.path.exists(mp3_fn):
+                    continue
             # transcribe midi from audio with Kong et al (tiktok)
-            if not os.path.exists(f"multi/midi/{idx}.mid"):
-                extract_midi(f"multi/mp3/{idx}.mp3", f"multi/midi/{idx}.mid")
+            if not os.path.exists(midi_fn):
+                extract_midi(mp3_fn, midi_fn)
             # pianoroll from midi
-            if not os.path.exists(f"multi/mel/{idx}.bin"):
-                convert2pianoroll(f"multi/midi/{idx}.mid", f"multi/pr{fs}/{idx}.bin", dd, fs)
+            if not os.path.exists(pr_fn):
+                convert2pianoroll(midi_fn, pr_fn, dd, fs)
             # cqt from mp3
-            if not os.path.exists(f"multi/cqt_full/{idx}.bin"):
-                extract_cqt_full(f"multi/mp3/{idx}.mp3", f"multi/cqt_full/{idx}.bin", dd)
+            if not os.path.exists(cqt_full_fn):
+                extract_cqt_full(mp3_fn, cqt_full_fn, dd)
             # downsample cqt
-            if not os.path.exists(f"multi/cqt{fs}/{idx}.bin"):
-                downsample_cqt(f"multi/cqt_full/{idx}.bin", f"multi/cqt{fs}/{idx}.bin", fs)
+            if not os.path.exists(cqt_fn):
+                downsample_cqt(cqt_full_fn, cqt_fn, fs)
