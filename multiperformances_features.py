@@ -80,22 +80,6 @@ def convert2pianoroll(path_midi, path_pianoroll, metadata, fs):
     # get onset matrix
     onset_matrix = create_onset_matrix(midi_data, fs=fs)
     assert onset_matrix.shape == piano_roll.shape, "onset matrix and piano roll should have the same shape"
-    if "start" in metadata.keys() and "end" in metadata.keys():
-        start, end = metadata["start"], metadata["end"]
-        start = int(start * fs)
-        end = int(end * fs)
-        piano_roll = piano_roll[start:end]
-        onset_matrix = onset_matrix[start:end]
-    elif "only_start" in metadata.keys():
-        start = metadata["only_start"]
-        start = int(start * fs)
-        piano_roll = piano_roll[start:]
-        onset_matrix = onset_matrix[start:]
-    elif "only_end" in metadata.keys():
-        end = metadata["only_end"]
-        end = int(end * fs)
-        piano_roll = piano_roll[:end]
-        onset_matrix = onset_matrix[:end]
     # save pianoroll
     save_binary(piano_roll, path_pianoroll)
     # save onset matrix
@@ -134,14 +118,14 @@ def load_json(path):
     return data
 
 
-def download_youtube_video_as_mp3(url, path, start_time, end_time):
+def download_youtube_video_as_mp3(url, file_name, start_time, end_time):
     """
     Download a video from a YouTube URL and save it as an MP3 file in the specified path. It first tries using pytube,
     and if it fails, it falls back to yt-dlp.
 
     Parameters:
     - url: The YouTube URL of the video to download.
-    - path: The directory path where the MP3 file will be saved.
+    - file_name: The directory path where the MP3 file will be saved.
     - start_time: The start time in seconds from where the audio should be trimmed.
     - end_time: The end time in seconds to where the audio should be trimmed.
     """
@@ -149,13 +133,13 @@ def download_youtube_video_as_mp3(url, path, start_time, end_time):
         # Try downloading with pytube
         yt = YouTube(url)
         video = yt.streams.filter(only_audio=True).first()
-        out_file = video.download(output_path=f"tmp/{path}")
+        out_file = video.download(output_path=f"tmp/{file_name}")
         mp3_file_path = out_file.replace(".mp4", ".mp3")
         
         # Rename the file to have a .mp3 extension
         os.rename(out_file, mp3_file_path)
     except Exception as e:
-        logging.exception(f"pytube failed, attempting with yt-dlp. Error: {e}")
+        logging.exception(f"pytube failed. Error: {e}")
         try:
             # Setup yt-dlp options for downloading audio
             ydl_opts = {
@@ -165,7 +149,7 @@ def download_youtube_video_as_mp3(url, path, start_time, end_time):
                     'preferredcodec': 'mp3',
                     'preferredquality': '192',
                 }],
-                'outtmpl': f'tmp/{path}/%(title)s.%(ext)s',  # Save in tmp/path with title as filename
+                'outtmpl': f'tmp/{file_name[:-4]}',
             }
 
             # Use yt-dlp to download the audio
@@ -173,9 +157,9 @@ def download_youtube_video_as_mp3(url, path, start_time, end_time):
                 ydl.download([url])
 
             # Find the downloaded MP3 file
-            for file in os.listdir(f'tmp/{path}'):
+            for file in os.listdir(f'tmp/{file_name}'):
                 if file.endswith('.mp3'):
-                    mp3_file_path = os.path.join(f'tmp/{path}', file)
+                    mp3_file_path = os.path.join(f'tmp/{file_name}', file)
                     break
         except Exception as e:
             logging.exception(f"yt-dlp failed. Error: {e}")
@@ -209,21 +193,6 @@ def extract_cqt_full(path_mp3, path_mel, metadata):
     log_cqt = librosa.amplitude_to_db(np.abs(cqt))
     log_mel_spectrogram = log_cqt.T
 
-    # Handle metadata for slicing the log Mel spectrogram
-    if "start" in metadata.keys() and "end" in metadata.keys():
-        start, end = metadata["start"], metadata["end"]
-        start_frame = int(start * sample_rate / hop_length)
-        end_frame = int(end * sample_rate / hop_length)
-        log_mel_spectrogram = log_mel_spectrogram[start_frame:end_frame]
-    elif "only_start" in metadata.keys():
-        start = metadata["only_start"]
-        start_frame = int(start * sample_rate / hop_length)
-        log_mel_spectrogram = log_mel_spectrogram[start_frame:]
-    elif "only_end" in metadata.keys():
-        end = metadata["only_end"]
-        end_frame = int(end * sample_rate / hop_length)
-        log_mel_spectrogram = log_mel_spectrogram[:end_frame]
-
     # Save the log Mel spectrogram
     save_binary(log_mel_spectrogram, path_mel)
 
@@ -256,7 +225,13 @@ def downsample_cqt(path_mel, to_save, fs):
 
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.ERROR, filename="multiperformances.log")
+    # Clear the log file
+    log_file = "multiperformances.log"
+    if os.path.exists(log_file):
+        os.remove(log_file)
+
+    # Configure logging
+    logging.basicConfig(level=logging.ERROR, filename=log_file)
     fs = 5
 
     dir_names = ["multi/mp3", "multi/midi", f"multi/pr{fs}", f"multi/cqt{fs}", "multi/cqt_full"]
