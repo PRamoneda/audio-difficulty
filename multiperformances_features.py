@@ -14,43 +14,8 @@ import numpy as np
 from tqdm import tqdm
 import logging
 
-from utils import load_binary
+from utils import *
 from scipy.signal import resample
-
-# Constants
-FS = 5
-STRANGE_CHARACTERS = ["#", "'", '"', '?', '!', "_", "\u2013", "/", ":", "&", "[", "]", "\u00ef", "\u00ea", "\u00e9",
-                        "\u00c9", "\u2014", "\u201c", "\u201d", "\u00b4", "\u00ed", "\u00e8", "\u00ed", "\u2018", "\u00c5",
-                        "\u0002", "\u00e1", "\u00f3", "\u2019"]
-MP3_PATH = "multi/mp3"
-MIDI_PATH = "multi/midi"
-PR_PATH = f"multi/pr{FS}"
-CQT_PATH = f"multi/cqt{FS}"
-CQT_FULL_PATH = "multi/cqt_full"
-
-
-def remove_strange_characters(string):
-    for character in STRANGE_CHARACTERS:
-        string = string.replace(character, "")
-        
-    return string
-
-
-def get_filenames(idx, piece_index):
-    idx = piece_index + ":" + idx
-    mp3_fn = f"{MP3_PATH}/{idx}.mp3"
-    midi_fn = f"{MIDI_PATH}/{idx}.mid"
-    pr_fn = f"{PR_PATH}/{idx}.bin"
-    cqt_fn = f"{CQT_PATH}/{idx}.bin"
-    cqt_full_fn = f"{CQT_FULL_PATH}/{idx}.bin"
-
-    return idx, mp3_fn, midi_fn, pr_fn, cqt_fn, cqt_full_fn
-
-
-def save_binary(data, path):
-    import pickle
-    with open(path, 'wb') as fp:
-        pickle.dump(data, fp)
 
 
 def extract_midi(path_mp3, path_midi):
@@ -131,13 +96,6 @@ def is_more_than_15(mp3_path):
     audio = MP3(mp3_path)
     duration = audio.info.length  # duration in seconds
     return duration > 15 * 60
-
-
-def load_json(path):
-    import json
-    with open(path) as f:
-        data = json.load(f)
-    return data
 
 
 def download_youtube_video_as_mp3(url, file_name, start_time, end_time):
@@ -247,19 +205,31 @@ def downsample_cqt(path_mel, to_save, fs):
     save_binary(new_mel.T, to_save)
 
 
-def init():
-    log_file = "multiperformances.log"
+def init(inference_type, fs):
+    # init logging
+    log_file = f"{inference_type}.log"
     with open(log_file, "w") as file:
         logging.basicConfig(level=logging.ERROR, filename=log_file)
 
-    dir_names = [MP3_PATH, MIDI_PATH, PR_PATH, CQT_PATH, CQT_FULL_PATH, "tmp"]
-    for dir_name in dir_names:
-        if not os.path.exists(dir_name):
-            os.makedirs(dir_name)
+    dir_dict = {
+        'mp3': f'{inference_type}/mp3',
+        'midi': f'{inference_type}/midi',
+        'pr': f'{inference_type}/pr{fs}',
+        'cqt': f'{inference_type}/cqt{fs}',
+        'cqt_full': f'{inference_type}/cqt_full',
+        'tmp': 'tmp'
+    }
+
+    for dir_path in dir_dict.values():
+        if not os.path.exists(dir_path):
+            os.makedirs(dir_path)
+
+    return dir_dict
 
 
 if __name__ == '__main__':
-    init()
+    fs = 5
+    dir_dict = init('multi', 5)
 
     for file_name in tqdm(os.listdir("benchmark_multiperformances")):
         if not file_name.endswith(".json"):
@@ -269,7 +239,7 @@ if __name__ == '__main__':
         piece_index = file_name.replace(".json", "")
 
         for idx, dd in data.items():
-            idx, mp3_fn, midi_fn, pr_fn, cqt_fn, cqt_full_fn = get_filenames(idx, piece_index)
+            idx, mp3_fn, midi_fn, pr_fn, cqt_fn, cqt_full_fn = get_filenames(dir_dict, idx, piece_index)
 
             # download the video from youtube and save into mp3
             if not os.path.exists(mp3_fn):
@@ -281,10 +251,10 @@ if __name__ == '__main__':
                 extract_midi(mp3_fn, midi_fn)
             # pianoroll from midi
             if not os.path.exists(pr_fn):
-                convert2pianoroll(midi_fn, pr_fn, dd, FS)
+                convert2pianoroll(midi_fn, pr_fn, dd, fs)
             # cqt from mp3
             if not os.path.exists(cqt_full_fn):
                 extract_cqt_full(mp3_fn, cqt_full_fn, dd)
             # downsample cqt
             if not os.path.exists(cqt_fn):
-                downsample_cqt(cqt_full_fn, cqt_fn, FS)
+                downsample_cqt(cqt_full_fn, cqt_fn, fs)
