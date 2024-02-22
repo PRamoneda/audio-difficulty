@@ -81,7 +81,7 @@ def compute_multi(rep, mode="basic"):
                     save[k] = {
                         "log_prob": log_prob.cpu().tolist(),
                         "pred": pred,
-                        "true": benchmark_data[unicodedata.normalize('NFC', piece_name)]["ps_rating"]
+                        "true": int(benchmark_data[unicodedata.normalize('NFC', piece_name)]["ps_rating"])
                     }
                 save_binary(save, f"multi/logits/{rep}_split_{split}.bin")
 
