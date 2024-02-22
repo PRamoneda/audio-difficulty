@@ -2,10 +2,9 @@
 import math
 import os
 import os.path
-from multiprocessing import Pool
 
 from pytube import YouTube
-from moviepy.editor import VideoFileClip
+from moviepy.editor import *
 import yt_dlp
 
 import librosa
@@ -15,9 +14,9 @@ import numpy as np
 from tqdm import tqdm
 import logging
 
-from get_cqt import extract_mel, extract_mel_v2
 from utils import load_binary
 from scipy.signal import resample
+
 
 def remove_strange_characters(string):
     string = string.replace("#", "")
@@ -135,6 +134,7 @@ def process_video(arguments):
 
 from mutagen.mp3 import MP3
 
+
 def is_more_than_15(mp3_path):
     """
     Checks if the duration of an MP3 file is more than 15 minutes.
@@ -155,10 +155,6 @@ def load_json(path):
     with open(path) as f:
         data = json.load(f)
     return data
-
-
-from pytube import YouTube
-from moviepy.editor import *
 
 
 def download_youtube_video_as_mp3(url, path, start_time, end_time):
@@ -183,26 +179,30 @@ def download_youtube_video_as_mp3(url, path, start_time, end_time):
         os.rename(out_file, mp3_file_path)
     except Exception as e:
         logging.exception(f"pytube failed, attempting with yt-dlp. Error: {e}")
-        # Setup yt-dlp options for downloading audio
-        ydl_opts = {
-            'format': 'bestaudio/best',
-            'postprocessors': [{
-                'key': 'FFmpegExtractAudio',
-                'preferredcodec': 'mp3',
-                'preferredquality': '192',
-            }],
-            'outtmpl': f'tmp/{path}/%(title)s.%(ext)s',  # Save in tmp/path with title as filename
-        }
+        try:
+            # Setup yt-dlp options for downloading audio
+            ydl_opts = {
+                'format': 'bestaudio/best',
+                'postprocessors': [{
+                    'key': 'FFmpegExtractAudio',
+                    'preferredcodec': 'mp3',
+                    'preferredquality': '192',
+                }],
+                'outtmpl': f'tmp/{path}/%(title)s.%(ext)s',  # Save in tmp/path with title as filename
+            }
 
-        # Use yt-dlp to download the audio
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            ydl.download([url])
+            # Use yt-dlp to download the audio
+            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                ydl.download([url])
 
-        # Find the downloaded MP3 file
-        for file in os.listdir(f'tmp/{path}'):
-            if file.endswith('.mp3'):
-                mp3_file_path = os.path.join(f'tmp/{path}', file)
-                break
+            # Find the downloaded MP3 file
+            for file in os.listdir(f'tmp/{path}'):
+                if file.endswith('.mp3'):
+                    mp3_file_path = os.path.join(f'tmp/{path}', file)
+                    break
+        except Exception as e:
+            logging.exception(f"yt-dlp failed. Error: {e}")
+            return
 
     # Load the downloaded MP3 file
     audio_clip = AudioFileClip(mp3_file_path)
@@ -221,18 +221,16 @@ def download_youtube_video_as_mp3(url, path, start_time, end_time):
     audio_clip.close()
     trimmed_audio.close()
 
+
 def extract_cqt_full(path_mp3, path_mel, metadata):
     # Load the audio at a sampling rate of 44100 Hz
     sample_rate = 44100
     audio, _ = librosa.load(path_mp3, sr=sample_rate, mono=True)
 
-
-
     hop_length = 160
     cqt = librosa.cqt(audio, sr=sample_rate, hop_length=hop_length, n_bins=88, bins_per_octave=12)
     log_cqt = librosa.amplitude_to_db(np.abs(cqt))
     log_mel_spectrogram = log_cqt.T
-
 
     # Handle metadata for slicing the log Mel spectrogram
     if "start" in metadata.keys() and "end" in metadata.keys():
@@ -251,6 +249,7 @@ def extract_cqt_full(path_mp3, path_mel, metadata):
 
     # Save the log Mel spectrogram
     save_binary(log_mel_spectrogram, path_mel)
+
 
 def downsample_log_mel_spectrogram(log_mel_spectrogram, target_fs):
     """
