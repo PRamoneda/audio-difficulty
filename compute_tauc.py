@@ -27,17 +27,17 @@ def mean_std(data):
 def print_for_paper(result):
     model_type_dict = {
         # single task
-        'audio_midi_cqt5_ps_v5' : 'CQT5',
-        'audio_midi_pianoroll_ps_5_v4' : 'PR5',
+        'audio_midi_cqt5_ps_v5' : 'CQT',
+        'audio_midi_pianoroll_ps_5_v4' : 'PR',
         'audio_midi_multi_ps_v5' : "MM",
 
         # multi task with era
-        'audio_midi_cqt5era_v1' : 'CQT5',
-        'audio_midi_pr5era_v1' : 'PR5',
+        'audio_midi_cqt5era_v1' : 'CQT',
+        'audio_midi_pr5era_v1' : 'PR',
 
         # multi task with multi ranking
-        'audio_midi_cqt5multiranking_v10' : 'CQT5',
-        'audio_midi_pr5multiranking_v10' : 'PR5'
+        'audio_midi_cqt5multiranking_v10' : 'CQT',
+        'audio_midi_pr5multiranking_v10' : 'PR'
     }
 
     model_types = list(model_type_dict.keys())
@@ -53,16 +53,17 @@ def print_for_paper(result):
 
 
 if __name__ == "__main__":
+    inference_type = "multi"
     result = defaultdict(list)
-    for filename in os.listdir("multi/logits"):
+    for filename in os.listdir(f"{inference_type}/logits"):
         if not filename.endswith(".bin"):
             continue
 
         model_type = filename.split("_split")[0]
-        result[model_type].append(compute_tauc(f"multi/logits/{filename}"))
+        result[model_type].append(compute_tauc(f"{inference_type}/logits/{filename}"))
 
     for model_type, data in result.items():
         result[model_type] = mean_std(data)
 
-    save_json(result, "multi_tauc.json")
+    save_json(result, f"{inference_type}_tauc.json")
     print_for_paper(result)
