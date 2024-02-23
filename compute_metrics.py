@@ -60,14 +60,23 @@ def print_for_paper(result):
     model_types = list(MODEL_TYPE_DICT.keys())
     assert len(model_types) == len(result), f"{len(model_types)} != {len(result)}"
     assert set(model_types) == set(result.keys()), f"{model_types} != {set(result.keys())}"
+    decimal_points = {
+        'mse': (2, 2),
+        'acc': (1, 2),
+        'tau_c': (3, 3)
+    }
 
     for model_type in model_types:
         table_line = f"& {MODEL_TYPE_DICT[model_type]}$_{{5}}$"
         split_results = result[model_type]
         for metric_name, data in split_results.items(): # mse, acc, tau_c
-            formatted_mean = f"{mean(data):.3f}".lstrip('0')
-            formatted_std = f"{stdev(data):.3f}".lstrip('0')
-            table_line += f" & {formatted_mean} ({formatted_std})"
+            mean_val, std_val = mean(data), stdev(data)
+            if metric_name == "acc":
+                mean_val *= 100
+                std_val *= 100
+            formatted_mean = f"{mean_val:.{decimal_points[metric_name][0]}f}".lstrip('0')
+            formatted_std = f"{std_val:.{decimal_points[metric_name][1]}f}".lstrip('0')
+            table_line += f" & {formatted_mean}({formatted_std})"
 
         table_line += " \\\\"
         print(table_line)
