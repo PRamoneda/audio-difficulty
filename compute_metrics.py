@@ -56,33 +56,30 @@ def compute_metrics(dir_path, model_type):
     return metrics
 
 
-# def mean_std(data):
-#     mean_val = mean(data)
-#     std_val = stdev(data)
-
-#     return {"data": data, "mean": mean_val, "std": std_val}
-
-
 def print_for_paper(result):
     model_types = list(MODEL_TYPE_DICT.keys())
     assert len(model_types) == len(result), f"{len(model_types)} != {len(result)}"
     assert set(model_types) == set(result.keys()), f"{model_types} != {set(result.keys())}"
 
     for model_type in model_types:
-        data = result[model_type]
-        formatted_mean = f"{mean(data):.3f}".lstrip('0')
-        formatted_std = f"{stdev(data):.3f}".lstrip('0')
+        table_line = f"& {MODEL_TYPE_DICT[model_type]}$_{{5}}$"
+        split_results = result[model_type]
+        for metric_name, data in split_results.items(): # mse, acc, tau_c
+            formatted_mean = f"{mean(data):.3f}".lstrip('0')
+            formatted_std = f"{stdev(data):.3f}".lstrip('0')
+            table_line += f" & {formatted_mean} ({formatted_std})"
 
-        print(f"& {MODEL_TYPE_DICT[model_type]}$_{{5}}$ & {formatted_mean} ({formatted_std}) \\\\")
+        table_line += " \\\\"
+        print(table_line)
 
 
 if __name__ == "__main__":
     inference_type = "multi"
     dir_path = f"{inference_type}/logits"
-    result = defaultdict(list)
+    result = defaultdict()
 
     for model_type in MODEL_TYPE_DICT.keys():
-        result[model_type].append(compute_metrics(dir_path, model_type))
+        result[model_type] = compute_metrics(dir_path, model_type)
 
     save_json(result, f"{inference_type}_metrics.json")
-    # print_for_paper(result)
+    print_for_paper(result)
