@@ -33,16 +33,20 @@ def get_mse_macro(y_true, y_pred):
     return mean(mse_each_class)
 
 
-def compute_metrics(dir_path, model_type):
+def compute_metrics(dir_path, model_type, ps_only):
     mse, acc, tau_c = [], [], []
     for split in range(5):
         bin_file_name = f'{dir_path}/{model_type}_split_{split}.bin'
         data = load_binary(bin_file_name)
 
         pred_list, true_list = [], []
-        for data_pr in data.values():
+        for data_key, data_pr in data.items():
+            if ps_only and '_from_ps' not in data_key:
+                continue
             true_list.append(int(data_pr['true']))
             pred_list.append(int(data_pr['pred']))
+        if ps_only:
+            assert len(true_list) == 55, f"{len(true_list)} != 55"
         
         mse.append(get_mse_macro(true_list, pred_list))
         acc.append(balanced_accuracy_score(true_list, pred_list))
@@ -85,8 +89,8 @@ def print_for_paper(result):
 
 if __name__ == "__main__":
     parser = ArgumentParser()
-    parser.add_argument("--inference_type", type=str)
-    parser.add_argument("--ps_only", type=bool)
+    parser.add_argument("--inference_type", type=str, required=True)
+    parser.add_argument("--ps_only", type=bool, required=True)
     args = parser.parse_args()
 
     inference_type = args.inference_type
@@ -96,7 +100,8 @@ if __name__ == "__main__":
     result = defaultdict()
 
     for model_type in MODEL_TYPE_DICT.keys():
-        result[model_type] = compute_metrics(dir_path, model_type)
+        result[model_type] = compute_metrics(dir_path, model_type, ps_only)
 
-    save_json(result, f"{inference_type}_metrics.json")
+    print(inference_type, ps_only)
+    save_json(result, f"{inference_type}_{ps_only}_metrics.json")
     print_for_paper(result)
