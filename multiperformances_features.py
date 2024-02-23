@@ -18,9 +18,6 @@ from utils import *
 from scipy.signal import resample
 
 
-DIR_DICT = {}
-
-
 def extract_midi(path_mp3, path_midi):
     assert os.path.exists(path_mp3), f"File {path_mp3} does not exist"
     # Load audio
@@ -214,6 +211,7 @@ def init(inference_type, fs):
     with open(log_file, "w") as file:
         logging.basicConfig(level=logging.ERROR, filename=log_file)
 
+    global DIR_DICT
     DIR_DICT = {
         'mp3': f'{inference_type}/mp3',
         'midi': f'{inference_type}/midi',
