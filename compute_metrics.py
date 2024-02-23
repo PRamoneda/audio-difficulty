@@ -4,6 +4,7 @@ from collections import defaultdict
 from scipy.stats import kendalltau
 from statistics import mean, stdev
 from sklearn.metrics import mean_squared_error, balanced_accuracy_score
+from argparse import ArgumentParser
 
 from utils import *
 
@@ -83,7 +84,14 @@ def print_for_paper(result):
 
 
 if __name__ == "__main__":
-    inference_type = "multi"
+    parser = ArgumentParser()
+    parser.add_argument("--inference_type", type=str)
+    parser.add_argument("--ps_only", type=bool)
+    args = parser.parse_args()
+
+    inference_type = args.inference_type
+    ps_only = args.ps_only
+    
     dir_path = f"{inference_type}/logits"
     result = defaultdict()
 
