@@ -90,7 +90,7 @@ def print_for_paper(result):
 if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument("--inference_type", type=str, required=True)
-    parser.add_argument("--ps_only", type=bool, required=True)
+    parser.add_argument("--ps_only", action='store_true')
     args = parser.parse_args()
 
     inference_type = args.inference_type
@@ -103,5 +103,5 @@ if __name__ == "__main__":
         result[model_type] = compute_metrics(dir_path, model_type, ps_only)
 
     print(inference_type, ps_only)
-    save_json(result, f"{inference_type}_{ps_only}_metrics.json")
+    save_json(result, f"cache/{inference_type}_{ps_only}_metrics.json")
     print_for_paper(result)
