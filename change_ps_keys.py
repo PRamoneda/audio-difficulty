@@ -11,8 +11,7 @@ if __name__ == "__main__":
         
         json_filename = dir_name / file_name
         data = load_json(f'{dir_name}/{file_name}')
-        # Assuming the dictionary has at least one key-value pair
-        first_key = list(data.keys())[0]
-        new_key = first_key + '_from_ps'
-        data_new = OrderedDict([(new_key, data.pop(first_key))] + list(data.items()))
-        save_json(data_new, json_filename)
+        keys, values = list(data.keys()), list(data.values())
+        keys[0] = keys[0] + '_from_ps'
+        data_new = {key:value for key, value in zip(keys, values)}
+        save_json(data_new, json_filename, sort_keys = False)

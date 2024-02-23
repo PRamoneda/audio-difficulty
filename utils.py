@@ -9,9 +9,9 @@ def load_json(name_file):
     return data
 
 
-def save_json(dictionary, name_file):
+def save_json(dictionary, name_file, sort_keys=True):
     with open(name_file, 'w') as fp:
-        json.dump(dictionary, fp, sort_keys=True, indent=4)
+        json.dump(dictionary, fp, sort_keys=sort_keys, indent=4)
 
 
 def prediction2label(pred):
