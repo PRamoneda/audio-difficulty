@@ -1,0 +1,35 @@
+[tool.poetry]
+name = "interface-audio-difficulty"
+version = "0.1.0"
+description = ""
+authors = ["PRamoneda <PRamoneda@github.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+gradio = "^5.29.0"
+pydub = "^0.25.1"
+yt-dlp = "^2025.4.30"
+librosa = "0.9.2"
+pretty_midi = "^0.2.10"
+ffmpeg-python = "^0.2.0"
+scipy = "^1.13.0"
+torch = {version = "2.4.0", source = "torch-cu121"}
+piano-transcription-inference = "^0.0.6"
+seaborn = "^0.13.2"
+torchaudio = {version = "2.4.0", source = "torch-cu121"}
+
+[[tool.poetry.source]]
+name = "torch-cuda"
+url = "https://download.pytorch.org/whl/cu121"
+priority = "primary"
+
+
+[[tool.poetry.source]]
+name = "torch-cu121"
+url = "https://download.pytorch.org/whl/cu121"
+priority = "primary"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

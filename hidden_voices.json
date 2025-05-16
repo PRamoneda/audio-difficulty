@@ -21,8 +21,8 @@
             "Black Grooves: Reviews of new black music releases": "https://blackgrooves.org/piano-works-zenobia-powell-perry/",
             "Zenobia Powell Perry - Drizzle Lyrics": "https://genius.com/Zenobia-powell-perry-drizzle-lyrics"
         },
-        "grade": "early-intermediate",
-        "grade_num": 2,
+        "grade": "late-elementary",
+        "grade_num": 1,
         "video_url": "https://www.youtube.com/embed/HH9BWme6o8M?modestbranding=0&html5=1&rel=0&autoplay=0&wmode=opaque&loop=0&controls=1&autohide=0&showinfo=0&theme=dark&color=red&enablejsapi=0&enablejsapi=1&origin=https%3A%2F%2Fwww.colorado.edu"
     },
     "Rabbit Foot, by Florence Price": {
@@ -30,6 +30,7 @@
         "title": "Rabbit Foot",
         "composer": "Florence Price",
         "source_urls": {
+            "Florence Price website": "https://florenceprice.com/",
             "Classical Lost And Found: Florence Price Rediscovered": "https://www.npr.org/sections/deceptivecadence/2012/02/27/147522468/classical-lost-and-found-florence-b-price-rediscovered",
             "Florence Price": "https://en.wikipedia.org/wiki/Florence_Price",
             "CU Philharmonia honors Florence Price in newly imagined orchestration": "https://www.colorado.edu/music/2022/01/19/cu-philharmonia-honors-florence-price-newly-imagined-orchestration",
@@ -57,6 +58,7 @@
         "title": "Rocking Chair",
         "composer": "Florence Price",
         "source_urls": {
+            "Florence Price website": "https://florenceprice.com/",
             "Classical Lost And Found: Florence Price Rediscovered": "https://www.npr.org/sections/deceptivecadence/2012/02/27/147522468/classical-lost-and-found-florence-b-price-rediscovered",
             "Florence Price": "https://en.wikipedia.org/wiki/Florence_Price",
             "CU Philharmonia honors Florence Price in newly imagined orchestration": "https://www.colorado.edu/music/2022/01/19/cu-philharmonia-honors-florence-price-newly-imagined-orchestration",
@@ -68,9 +70,10 @@
     },
     "Round and Round, from Piano Potpourri. Zenobia Powell Perry": {
         "url": "https://www.colorado.edu/project/hidden-voices/2021/09/15/round-and-round-piano-potpourri-zenobia-powell-perry",
-        "title": "Round and Round, from Piano Potpourri",
-        "composer": "Zenobia Powell Perry",
+        "title": null,
+        "composer": null,
         "source_urls": {
+            "Hildegard Publishing": "https://www.hildegard.com/composer_detail.php?id=146",
             "Zenobia Powell Perry": "https://en.wikipedia.org/wiki/Zenobia_Powell_Perry%C2%A0",
             "Zenobia Powell Perry - Drizzle Lyrics": "https://genius.com/Zenobia-powell-perry-drizzle-lyrics"
         },
@@ -95,6 +98,7 @@
         "title": "Jazzed-up Circumstance",
         "composer": "Regina A. Harris Baiocchi",
         "source_urls": {
+            "composer's website": "https://reginaharrisbaiocchi.com/",
             "Regina Harris Baiocchi": "https://reginaharrisbaiocchi.com/",
             "Composer's website": "https://reginaharrisbaiocchi.com/"
         },
@@ -137,8 +141,7 @@
         },
         "grade": "mid-intermediate",
         "grade_num": 3,
-        "video_url": "https://www.youtube.com/watch?v=oJSmVFGDOJQ",
-        "start_time": 66
+        "video_url": "https://www.youtube.com/watch?v=oJSmVFGDOJQ"
     },
     "\u201cWaltz for Miles,\u201d from Portraits in Jazz, by Valerie Capers": {
         "url": "https://www.colorado.edu/project/hidden-voices/2020/04/26/waltz-miles-portraits-jazz-valerie-capers",
@@ -173,6 +176,83 @@
         "grade_num": 3,
         "video_url": "https://www.youtube.com/embed/H83w2O7b42Q?modestbranding=0&html5=1&rel=0&autoplay=0&wmode=opaque&loop=0&controls=1&autohide=0&showinfo=0&theme=dark&color=red&enablejsapi=0&enablejsapi=1&origin=https%3A%2F%2Fwww.colorado.edu"
     },
+    "Blues for \"The Duke,\u201d from Portraits in Jazz, by Valerie Capers": {
+        "url": "https://www.colorado.edu/project/hidden-voices/2020/04/26/blues-duke-portraits-jazz-valerie-capers",
+        "title": "Blues for \"The Duke,\u201d from Portraits in Jazz",
+        "composer": "Valerie Capers",
+        "source_urls": {
+            "Valerie Capers' official website": "https://valcapmusic.com/bio/"
+        },
+        "grade": "mid-intermediate",
+        "grade_num": 3,
+        "video_url": "https://www.youtube.com/embed/_06Ie0pHBPU?modestbranding=0&html5=1&rel=0&autoplay=0&wmode=opaque&loop=0&controls=1&autohide=0&showinfo=0&theme=dark&color=red&enablejsapi=0&enablejsapi=1&origin=https%3A%2F%2Fwww.colorado.edu"
+    },
+    "\u201cA Taste of Bass,\u201d from Portraits of Jazz, by Valerie Capers": {
+        "url": "https://www.colorado.edu/project/hidden-voices/2020/04/26/taste-bass-portraits-jazz-valerie-capers",
+        "title": "\u201cA Taste of Bass,\u201d from Portraits of Jazz",
+        "composer": "Valerie Capers",
+        "source_urls": {
+            "Valerie Capers' official website": "https://valcapmusic.com/bio/"
+        },
+        "grade": "mid-intermediate",
+        "grade_num": 3,
+        "video_url": "https://www.youtube.com/embed/f0Z09C2APSY?modestbranding=0&html5=1&rel=0&autoplay=0&wmode=opaque&loop=0&controls=1&autohide=0&showinfo=0&theme=dark&color=red&enablejsapi=0&enablejsapi=1&origin=https%3A%2F%2Fwww.colorado.edu"
+    },
+    "\u201cBilly\u2019s Song,\u201d from Portraits in Jazz, by Valerie Capers": {
+        "url": "https://www.colorado.edu/project/hidden-voices/2020/04/26/billys-song-portraits-jazz-valerie-capers",
+        "title": "\u201cBilly\u2019s Song,\u201d from Portraits in Jazz",
+        "composer": "Valerie Capers",
+        "source_urls": {
+            "Valerie Capers' official website": "https://valcapmusic.com/bio/"
+        },
+        "grade": "mid-intermediate",
+        "grade_num": 3,
+        "video_url": "https://www.youtube.com/embed/_tOJ22KxLeI?modestbranding=0&html5=1&rel=0&autoplay=0&wmode=opaque&loop=0&controls=1&autohide=0&showinfo=0&theme=dark&color=red&enablejsapi=0&enablejsapi=1&origin=https%3A%2F%2Fwww.colorado.edu"
+    },
+    "Mr. \u201cSatchmo,\u201d from Portraits in Jazz, by Valerie Capers": {
+        "url": "https://www.colorado.edu/project/hidden-voices/2020/04/26/mr-satchmo-portraits-jazz-valerie-capers",
+        "title": "Mr. \u201cSatchmo,\u201d from Portraits in Jazz",
+        "composer": "Valerie Capers",
+        "source_urls": {
+            "Valerie Capers\u2019 official website": "http://valcapmusic.com/bio/"
+        },
+        "grade": "mid-intermediate",
+        "grade_num": 3,
+        "video_url": "https://www.youtube.com/embed/0WzNyjPAAew?modestbranding=0&html5=1&rel=0&autoplay=0&wmode=opaque&loop=0&controls=1&autohide=0&showinfo=0&theme=dark&color=red&enablejsapi=0&enablejsapi=1&origin=https%3A%2F%2Fwww.colorado.edu"
+    },
+    "\u201cCanci\u00f3n de la Havana,\u201d from Portraits in Jazz, by Valerie Capers": {
+        "url": "https://www.colorado.edu/project/hidden-voices/2020/04/26/cancion-de-la-havana-portraits-jazz-valerie-capers",
+        "title": "\u201cCanci\u00f3n de la Havana,\u201d from Portraits in Jazz",
+        "composer": "Valerie Capers",
+        "source_urls": {
+            "Valerie Capers' official website": "https://valcapmusic.com/bio/"
+        },
+        "grade": "mid-intermediate",
+        "grade_num": 3,
+        "video_url": "https://www.youtube.com/watch?v=OSV_unJLJaQ"
+    },
+    "\u201cBossa Brazilia,\u201d from Portraits in Jazz, by Valerie Capers": {
+        "url": "https://www.colorado.edu/project/hidden-voices/2020/04/26/bossa-brazilia-portraits-jazz-valerie-capers",
+        "title": "\u201cBossa Brazilia,\u201d from Portraits in Jazz",
+        "composer": "Valerie Capers",
+        "source_urls": {
+            "Valerie Capers' official website": "https://valcapmusic.com/bio/"
+        },
+        "grade": "mid-intermediate",
+        "grade_num": 3,
+        "video_url": "https://www.youtube.com/embed/1cWhHX9BB48?modestbranding=0&html5=1&rel=0&autoplay=0&wmode=opaque&loop=0&controls=1&autohide=0&showinfo=0&theme=dark&color=red&enablejsapi=0&enablejsapi=1&origin=https%3A%2F%2Fwww.colorado.edu"
+    },
+    "\u201cBlue Bird,\u201d from Portraits in Jazz, by Valerie Capers": {
+        "url": "https://www.colorado.edu/project/hidden-voices/2020/04/26/blue-bird-portraits-jazz-valerie-capers",
+        "title": "\u201cBlue Bird,\u201d from Portraits in Jazz",
+        "composer": "Valerie Capers",
+        "source_urls": {
+            "Valerie Capers' official website": "https://valcapmusic.com/bio/"
+        },
+        "grade": "mid-intermediate",
+        "grade_num": 3,
+        "video_url": "https://www.youtube.com/watch?v=cUW9LRvPSks"
+    },
     "Wanchai Road, by Philippa Schuyler": {
         "url": "https://www.colorado.edu/project/hidden-voices/2023/05/08/wanchai-road-philippa-schuyler",
         "title": "Wanchai Road",
@@ -203,6 +283,7 @@
         "title": "\u201cSong Without Words (Pleading)\u201d",
         "composer": "Florence Price",
         "source_urls": {
+            "Florence Price website": "https://florenceprice.com/",
             "Classical Lost And Found: Florence Price Rediscovered": "https://www.npr.org/sections/deceptivecadence/2012/02/27/147522468/classical-lost-and-found-florence-b-price-rediscovered",
             "Florence Price": "https://en.wikipedia.org/wiki/Florence_Price",
             "CU Philharmonia honors Florence Price in newly imagined orchestration": "https://www.colorado.edu/music/2022/01/19/cu-philharmonia-honors-florence-price-newly-imagined-orchestration",
@@ -229,6 +310,7 @@
         "title": "Little Melody in E-flat, from Seven Miniatures",
         "composer": "Florence Price",
         "source_urls": {
+            "Florence Price website": "https://florenceprice.com/",
             "Classical Lost And Found: Florence Price Rediscovered": "https://www.npr.org/sections/deceptivecadence/2012/02/27/147522468/classical-lost-and-found-florence-b-price-rediscovered",
             "Florence Price": "https://en.wikipedia.org/wiki/Florence_Price",
             "CU Philharmonia honors Florence Price in newly imagined orchestration": "https://www.colorado.edu/music/2022/01/19/cu-philharmonia-honors-florence-price-newly-imagined-orchestration",
@@ -267,6 +349,8 @@
         "title": "Azuretta",
         "composer": "Regina Harris Baiocchi",
         "source_urls": {
+            "composer's website": "https://reginaharrisbaiocchi.com/",
+            "sample of the first two pages": "https://reginaharrisbaiocchi.com/wp-content/uploads/2015/07/Azuretta-website.pdf",
             "Regina Harris Baiocchi": "https://reginaharrisbaiocchi.com/",
             "Azuretta Regina Harris Baiocchi performed by Samantha Ege": "https://www.youtube.com/watch?v=LhoepN-yHT0"
         },
@@ -287,18 +371,32 @@
         "grade_num": 4,
         "video_url": "https://www.youtube.com/watch?v=4eOSv9IKuNg"
     },
-    "Mr. \u201cSatchmo,\u201d from Portraits in Jazz, by Valerie Capers": {
-        "url": "https://www.colorado.edu/project/hidden-voices/2020/04/26/mr-satchmo-portraits-jazz-valerie-capers",
-        "title": "Mr. \u201cSatchmo,\u201d from Portraits in Jazz",
+    "\u201cCool-Trane,\u201d from Portraits in Jazz, by Valerie Capers": {
+        "url": "https://www.colorado.edu/project/hidden-voices/2020/04/26/cool-trane-portraits-jazz-valerie-capers",
+        "title": "\u201cCool-Trane,\u201d from Portraits in Jazz",
         "composer": "Valerie Capers",
+        "source_urls": {
+            "Valerie Capers' official website": "https://valcapmusic.com/bio/"
+        },
         "grade": "late-intermediate",
         "grade_num": 4,
-        "video_url": "https://www.youtube.com/embed/0WzNyjPAAew?modestbranding=0&html5=1&rel=0&autoplay=0&wmode=opaque&loop=0&controls=1&autohide=0&showinfo=0&theme=dark&color=red&enablejsapi=0&enablejsapi=1&origin=https%3A%2F%2Fwww.colorado.edu"
+        "video_url": "https://www.youtube.com/embed/_cgtLQJr5wg?modestbranding=0&html5=1&rel=0&autoplay=0&wmode=opaque&loop=0&controls=1&autohide=0&showinfo=0&theme=dark&color=red&enablejsapi=0&enablejsapi=1&origin=https%3A%2F%2Fwww.colorado.edu"
+    },
+    "\"Dance,\" by Mable Bailey": {
+        "url": "https://www.colorado.edu/project/hidden-voices/2020/04/25/dance-mable-bailey",
+        "title": "Dance,",
+        "composer": "Mable Bailey",
+        "source_urls": {
+            "Hildegard Publishing Company. Music by Women Composers": "http://www.hildegard.com/composer_detail.php?id=16"
+        },
+        "grade": "late-intermediate",
+        "grade_num": 4,
+        "video_url": "https://www.youtube.com/embed/3ed0aFPAi5A?modestbranding=0&html5=1&rel=0&autoplay=0&wmode=opaque&loop=0&controls=1&autohide=0&showinfo=0&theme=dark&color=red&enablejsapi=0&enablejsapi=1&origin=https%3A%2F%2Fwww.colorado.edu"
     },
     "Walkin' and Swingin'. Mary Lou Williams.": {
         "url": "https://www.colorado.edu/project/hidden-voices/2024/01/21/walkin-and-swingin-mary-lou-williams",
-        "title": "Walkin' and Swingin'",
-        "composer": "Mary Lou Williams",
+        "title": null,
+        "composer": null,
         "source_urls": {
             "Mary Lou Williams: A Centennial Celebration": "https://www.npr.org/2010/05/07/126613987/mary-lou-williams-a-centennial-celebration"
         },
@@ -311,6 +409,7 @@
         "title": "Dance of the Cotton Blossoms (1938)",
         "composer": "Florence Price",
         "source_urls": {
+            "Florence Price website": "https://florenceprice.com/",
             "Classical Lost And Found: Florence Price Rediscovered": "https://www.npr.org/sections/deceptivecadence/2012/02/27/147522468/classical-lost-and-found-florence-b-price-rediscovered",
             "Florence Price": "https://en.wikipedia.org/wiki/Florence_Price",
             "CU Philharmonia honors Florence Price in newly imagined orchestration": "https://www.colorado.edu/music/2022/01/19/cu-philharmonia-honors-florence-price-newly-imagined-orchestration",
@@ -322,9 +421,10 @@
     },
     "Memory Mist, from Seven Miniatures. Florence Price": {
         "url": "https://www.colorado.edu/project/hidden-voices/2022/05/10/memory-mist-seven-miniatures-florence-price",
-        "title": "Memory Mist, from Seven Miniatures",
-        "composer": "Florence Price",
+        "title": null,
+        "composer": null,
         "source_urls": {
+            "Florence Price website": "https://florenceprice.com/",
             "Classical Lost And Found: Florence Price Rediscovered": "https://www.npr.org/sections/deceptivecadence/2012/02/27/147522468/classical-lost-and-found-florence-b-price-rediscovered",
             "Florence Price": "https://en.wikipedia.org/wiki/Florence_Price",
             "CU Philharmonia honors Florence Price in newly imagined orchestration": "https://www.colorado.edu/music/2022/01/19/cu-philharmonia-honors-florence-price-newly-imagined-orchestration",
@@ -414,7 +514,7 @@
         "grade_num": 5,
         "video_url": "https://www.youtube.com/watch?v=ZLdzoZ9V2A8"
     },
-    "\"Promenade,\" from Piano Potpourri, by Zenobia Powell Perry": {
+    "Promenade, from Piano Potpourri, by Zenobia Powell Perry": {
         "url": "https://www.colorado.edu/project/hidden-voices/2020/11/10/promenade-piano-potpourri-zenobia-powell-perry",
         "title": "Promenade,\" from Piano Potpourri",
         "composer": "Zenobia Powell Perry",
@@ -427,7 +527,22 @@
         "grade_num": 5,
         "video_url": "https://www.youtube.com/watch?v=jzAaXHo4SZ8"
     },
-    "\"Great Day\" Ode, by Jacqueline Hairston": {
+    "A Little Whimsy, by Dorothy Rudd Moore": {
+        "url": "https://www.colorado.edu/project/hidden-voices/2020/04/26/little-whimsy-dorothy-rudd-moore",
+        "title": "A Little Whimsy",
+        "composer": "Dorothy Rudd Moore",
+        "source_urls": {
+            "American Composers Alliance": "https://composers.com/composers/dorothy-rudd-moore",
+            "\u201cDorothy Rudd Moore.\u201d American Composers Alliance, August 17, 2019.": "https://composers.com/dorothy-rudd-moore",
+            "\u201cDorothy Rudd Moore.\u201d Wikipedia. Wikimedia Foundation, October 29, 2019.": "https://en.wikipedia.org/wiki/Dorothy_Rudd_Moore",
+            "An Examination of the Compositional Style of Dorothy Rudd Moore and Its Relationship to the Literary Influence of Langston Hughes.": "https://digitalscholarship.unlv.edu/thesesdissertations/1587/",
+            "Scholarship@UNLV": "mailto:Scholarship@UNLV"
+        },
+        "grade": "early-advanced",
+        "grade_num": 5,
+        "video_url": "https://www.youtube.com/embed/yfBLmheN1fg?modestbranding=0&html5=1&rel=0&autoplay=0&wmode=opaque&loop=0&controls=1&autohide=0&showinfo=0&theme=dark&color=red&enablejsapi=0&enablejsapi=1&origin=https%3A%2F%2Fwww.colorado.edu"
+    },
+    "Great Day Ode, by Jacqueline Hairston": {
         "url": "https://www.colorado.edu/project/hidden-voices/2021/10/25/great-day-ode-jacqueline-hairston",
         "title": "Great Day\" Ode",
         "composer": "Jacqueline Hairston",
@@ -439,7 +554,7 @@
         "grade_num": 6,
         "video_url": "https://www.youtube.com/embed/vJRrsZdUfCM?modestbranding=0&html5=1&rel=0&autoplay=0&wmode=opaque&loop=0&controls=1&autohide=0&showinfo=0&theme=dark&color=red&enablejsapi=0&enablejsapi=1&origin=https%3A%2F%2Fwww.colorado.edu"
     },
-    "\"Air,\" from Piano Sonata Op. 19, by Jeraldine S. Herbison": {
+    "Air, from Piano Sonata Op. 19, by Jeraldine S. Herbison": {
         "url": "https://www.colorado.edu/project/hidden-voices/2021/09/11/air-piano-sonata-op-19-jeraldine-s-herbison",
         "title": "Air,\" from Piano Sonata Op. 19",
         "composer": "Jeraldine S. Herbison",
@@ -455,6 +570,7 @@
         "title": "Homage, from Piano Potpourri",
         "composer": "Zenobia Powell Perry",
         "source_urls": {
+            "Hildegard Publishing": "https://www.hildegard.com/composer_detail.php?id=146",
             "Zenobia Powell Perry": "https://en.wikipedia.org/wiki/Zenobia_Powell_Perry%C2%A0",
             "Black Grooves: Reviews of new black music releases": "https://blackgrooves.org/piano-works-zenobia-powell-perry/",
             "Zenobia Powell Perry - Drizzle Lyrics": "https://genius.com/Zenobia-powell-perry-drizzle-lyrics"
@@ -475,7 +591,7 @@
         "grade_num": 6,
         "video_url": "https://www.youtube.com/watch?v=-MGBEsWB3BI"
     },
-    "\"Times Seven,\" from Piano Potpourri, by Zenobia Powell Perry": {
+    "Times Seven, from Piano Potpourri, by Zenobia Powell Perry": {
         "url": "https://www.colorado.edu/project/hidden-voices/2020/11/16/times-seven-piano-potpourri-zenobia-powell-perry",
         "title": "Times Seven,\" from Piano Potpourri",
         "composer": "Zenobia Powell Perry",
@@ -492,6 +608,13 @@
         "url": "https://www.colorado.edu/project/hidden-voices/2020/04/26/dream-and-variations-dorothy-rudd-moore",
         "title": "Dream and Variations",
         "composer": "Dorothy Rudd Moore",
+        "source_urls": {
+            "American Composers Alliance": "https://composers.com/composers/dorothy-rudd-moore",
+            "\u201cDorothy Rudd Moore.\u201d American Composers Alliance, August 17, 2019": "https://composers.com/dorothy-rudd-moore",
+            "\u201cDorothy Rudd Moore.\u201d Wikipedia. Wikimedia Foundation, October 29, 2019.": "http://en.wikipedia.org/wiki/Dorothy_Rudd_Moore",
+            "Lain, Latoya Andriel. \u201cAn Examination of the Compositional Style of Dorothy Rudd Moore and Its Relationship to the Literary Influence of Langston Hughes.\u201d Digital Scholarship@UNLV. Accessed December 12, 2019.": "https://digitalscholarship.unlv.edu/thesesdissertations/1587/",
+            "Dorothy Rudd Moore. American Composers Alliance.": "https://composers.com/dorothy-rudd-moore"
+        },
         "grade": "advanced",
         "grade_num": 6,
         "video_url": "https://www.youtube.com/watch?v=rluIZ73UJiY"
@@ -521,5 +644,82 @@
         "grade": "advanced",
         "grade_num": 6,
         "video_url": "https://www.youtube.com/watch?v=TWSZSj_vumU"
+    },
+    "\u201c1. Playful,\u201d from Moods for Piano, by Lettie Beckon Alston.": {
+        "url": "https://www.colorado.edu/project/hidden-voices/2020/04/26/1-playful-moods-piano-lettie-beckon-alston",
+        "title": "\u201c1. Playful,\u201d from Moods for Piano",
+        "composer": "Lettie Beckon Alston.",
+        "source_urls": {
+            "\"Alston, Lettie Beckon.\" Oxford Music Online.": "https://www.oxfordmusiconline.com/grovemusic/abstract/10.1093/gmo/9781561592630.001.0001/omo-9781561592630-e-1002227010",
+            "Hildegard Publishing Company. Music by Women Composers": "http://www.hildegard.com/composer_detail.php?id=23",
+            "Lettie Beckon Alston. The African American Art Song Alliance.": "https://www.artsongalliance.org/users/details/lettie-beckon-alston"
+        },
+        "grade": "advanced",
+        "grade_num": 6,
+        "video_url": "https://www.youtube.com/watch?v=kZLONfHGzJk"
+    },
+    "\u201c2. Mysteriously,\u201d from Moods for Piano, by Lettie Beckon Alston": {
+        "url": "https://www.colorado.edu/project/hidden-voices/2020/04/26/2-mysteriously-moods-piano-lettie-beckon-alston",
+        "title": "\u201c2. Mysteriously,\u201d from Moods for Piano",
+        "composer": "Lettie Beckon Alston",
+        "source_urls": {
+            "\"Alston, Lettie Beckon.\" Oxford Music Online.": "https://www.oxfordmusiconline.com/grovemusic/abstract/10.1093/gmo/9781561592630.001.0001/omo-9781561592630-e-1002227010",
+            "Hildegard Publishing Company. Music by Women Composers": "http://www.hildegard.com/composer_detail.php?id=23",
+            "Lettie Beckon Alston. The African American Art Song Alliance.": "https://www.artsongalliance.org/users/details/lettie-beckon-alston"
+        },
+        "grade": "advanced",
+        "grade_num": 6,
+        "video_url": "https://www.youtube.com/watch?v=3G9CXYpRNFU"
+    },
+    "\u201c3. Gloomy,\u201d from Moods for Piano, by Lettie Beckon Alston": {
+        "url": "https://www.colorado.edu/project/hidden-voices/2020/04/26/3-gloomy-moods-piano-lettie-beckon-alston",
+        "title": "\u201c3. Gloomy,\u201d from Moods for Piano",
+        "composer": "Lettie Beckon Alston",
+        "source_urls": {
+            "\"Alston, Lettie Beckon.\" Oxford Music Online.": "https://www.oxfordmusiconline.com/grovemusic/abstract/10.1093/gmo/9781561592630.001.0001/omo-9781561592630-e-1002227010",
+            "Hildegard Publishing Company. Music by Women Composers": "http://www.hildegard.com/composer_detail.php?id=23",
+            "Lettie Beckon Alston. The African American Art Song Alliance.": "https://www.artsongalliance.org/users/details/lettie-beckon-alston"
+        },
+        "grade": "advanced",
+        "grade_num": 6,
+        "video_url": "https://www.youtube.com/watch?v=qxGuwZSOnTI"
+    },
+    "\u201c4. Joyfully,\u201d from Moods for Piano, by Lettie Beckon Alston": {
+        "url": "https://www.colorado.edu/project/hidden-voices/2020/04/26/4-joyfully-moods-piano-lettie-beckon-alston",
+        "title": "\u201c4. Joyfully,\u201d from Moods for Piano",
+        "composer": "Lettie Beckon Alston",
+        "source_urls": {
+            "\"Alston, Lettie Beckon.\" Oxford Music Online.": "https://www.oxfordmusiconline.com/grovemusic/abstract/10.1093/gmo/9781561592630.001.0001/omo-9781561592630-e-1002227010",
+            "Hildegard Publishing Company. Music by Women Composers": "http://www.hildegard.com/composer_detail.php?id=23",
+            "Lettie Beckon Alston. The African American Art Song Alliance.": "https://www.artsongalliance.org/users/details/lettie-beckon-alston"
+        },
+        "grade": "advanced",
+        "grade_num": 6,
+        "video_url": "https://www.youtube.com/watch?v=Qe3Iy4FfZ30"
+    },
+    "Variations on \u201cLift Every Voice and Sing,\u201d by Lettie Beckon Alston": {
+        "url": "https://www.colorado.edu/project/hidden-voices/2020/04/25/variations-lift-every-voice-and-sing-lettie-beckon-alston",
+        "title": "Variations on \u201cLift Every Voice and Sing,\u201d",
+        "composer": "Lettie Beckon Alston",
+        "source_urls": {
+            "\"Alston, Lettie Beckon.\" Oxford Music Online.": "https://www.oxfordmusiconline.com/grovemusic/abstract/10.1093/gmo/9781561592630.001.0001/omo-9781561592630-e-1002227010",
+            "Hildegard Publishing Company. Music by Women Composers": "http://www.hildegard.com/composer_detail.php?id=23",
+            "Lettie Beckon Alston. The African American Art Song Alliance.": "https://www.artsongalliance.org/users/details/lettie-beckon-alston",
+            "Lift Every Voice and Sing by James Weldon Johnson. Poetry Foundation.": "https://www.poetryfoundation.org/poems/46549/lift-every-voice-and-sing"
+        },
+        "grade": "advanced",
+        "grade_num": 6,
+        "video_url": "https://www.youtube.com/embed/2mMgnrReRmA?modestbranding=0&html5=1&rel=0&autoplay=0&wmode=opaque&loop=0&controls=1&autohide=0&showinfo=0&theme=dark&color=red&enablejsapi=0&enablejsapi=1&origin=https%3A%2F%2Fwww.colorado.edu"
+    },
+    "\u201cDialogue,\u201d by Mable Bailey": {
+        "url": "https://www.colorado.edu/project/hidden-voices/2020/04/25/dialogue-mable-bailey",
+        "title": "\u201cDialogue,\u201d",
+        "composer": "Mable Bailey",
+        "source_urls": {
+            "Hildegard Publishing Company. Music by Women Composers": "http://www.hildegard.com/composer_detail.php?id=16"
+        },
+        "grade": "advanced",
+        "grade_num": 6,
+        "video_url": "https://www.youtube.com/embed/QCQUvVmJXf8?modestbranding=0&html5=1&rel=0&autoplay=0&wmode=opaque&loop=0&controls=1&autohide=0&showinfo=0&theme=dark&color=red&enablejsapi=0&enablejsapi=1&origin=https%3A%2F%2Fwww.colorado.edu"
     }
 }

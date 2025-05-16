@@ -389,9 +389,8 @@ def compute_for_eras(model_name):
 if __name__ == '__main__':
     # compute_model_basic("audio_midi_cqt5_ps_v5", "cqt5", modality_dropout=False)
     # compute_model_basic("audio_midi_cqt10_ps_v5", "cqt10", modality_dropout=False)
-    #
-    #
-    # compute_model_basic("audio_midi_pianoroll_ps_5_v4", "pianoroll5", modality_dropout=False)
+
+    compute_model_basic("audio_midi_pianoroll_ps_5_v4", "pianoroll5", modality_dropout=False)
     # compute_model_basic("audio_midi_pianoroll_ps_10_v5", "pianoroll10", modality_dropout=False)
     #
     # compute_model_basic("audio_midi_multi_ps_v5", "multimodal5", modality_dropout=False, only_cqt=False)
@@ -410,18 +409,18 @@ if __name__ == '__main__':
     # compute_only_genre("audio_midi_pianoroll_ps_5_v4", only_women=True)
     #
     # compute_only_genre("audio_midi_multi_ps_v5", only_women=True)
-    compute_for_eras("audio_midi_cqt5_ps_v5")
+    # compute_for_eras("audio_midi_cqt5_ps_v5")
 
-    print()
-
-    compute_for_eras("audio_midi_pianoroll_ps_5_v4")
-
-    print()
-
-    compute_for_eras("audio_midi_cqt5era_v1")
-    print()
-
-    compute_for_eras("audio_midi_pr5era_v1")
+    # print()
+    #
+    # compute_for_eras("audio_midi_pianoroll_ps_5_v4")
+    #
+    # print()
+    #
+    # compute_for_eras("audio_midi_cqt5era_v1")
+    # print()
+    #
+    # compute_for_eras("audio_midi_pr5era_v1")
 
 
 

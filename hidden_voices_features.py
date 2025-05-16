@@ -57,7 +57,7 @@ def extract_midi(path_mp3, path_midi):
     # Load audio
     (audio, _) = load_audio(path_mp3, sr=sample_rate, mono=True)
     # Transcriptor
-    transcriptor = PianoTranscription(device='cuda:0', checkpoint_path=None)  # device: 'cuda' | 'cpu'
+    transcriptor = PianoTranscription(device='cpu', checkpoint_path=None)  # device: 'cuda' | 'cpu'
     # Transcribe and write out to MIDI file
     transcriptor.transcribe(audio, path_midi)
 
